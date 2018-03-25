@@ -94,7 +94,7 @@ Try 'server.sh command help' for available server commands.
 
 The following instructions assume that the server script is already downloaded and installed on a Linux server
 
-1. **Install Vintage Story to play on Linux and to share worlds as a multiplayer LAN-Server**
+1. **Install Vintage Story to play on Linux and to share worlds with a local multiplayer LAN-Server**
    * Check the requirements for a complete install
    * Log in as the user who shall run the client and manage the LAN-Server
    * Open a terminal, change to the directory of server.sh, and execute:
