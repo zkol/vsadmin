@@ -57,28 +57,32 @@ For a complete server/client install (option -C) capable to run the client too, 
 
 ## Current Features
 
-Use: server.sh [OPTION]... (setup | update | reinstall | rollback)  
- or: server.sh [OPTION]... (start | stop | restart | status | backup | recover)
- or: server.sh [OPTION]... command SERVER_COMMAND
+Use:  server.sh [OPTION]... (setup | update | reinstall | rollback)  
+ or:  server.sh [OPTION]... (start | stop | restart | status | backup | recover)
+ or:  server.sh [OPTION]... command SERVER_COMMAND
 
-Setup options:
+###Setup options
+
  -o OWNER     Set custom owner name for software setup.
  -b BASEDIR   Set custom full directory path for software installation.
  -d DATADIR   Set custom full directory path for world data access.
  -C | -R      Consider complete|reduced package for installation.
 
-General options:
+###General options
+
  -v VERSION   Set reference versionstring (not latest version).
  -w WORLD     Set custom world subdirectory for data access.
  -U | -S      Consider unstable|stable branch for installation.
  -T           Trace script run in test mode (ignoring some checks).
 
-Technical options:
+###Technical options
+ 
  -l PID       Consider the lock that is hold by process id PID
  -p PORT      Set custom port to create or import world instances
 
-Server Commands:
- Try 'server.sh command help' for available server commands.
+###Server Commands
+
+Try 'server.sh command help' for available server commands.
 
 ## Howto
 
