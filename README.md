@@ -137,7 +137,16 @@ The following instructions assume that the server script is already downloaded a
      * Creates world folder /var/opt/vintagestory/w01-hunger-madness
      * Starts the forst server process
      * Prints the stats of the (hopefully sucessful) start of this process
-   
+
+1. **Privilege an admin user for the first world** (e.g. on a headless LAN-Server)
+   * Log in as an admin user who is allowed to run commands per sudo
+   * Open a terminal, change to the directory of server.sh, and execute:
+     * **sudo ./server.sh -w1 command op skol** (assuming skol is the Vintage Story username)
+   * Parameter -w is not necessary to address the instance with the lastet start time 
+   * Script result:
+     * Sends command op to the server
+     * Prints the command result (that has been logged by the server)
+     
 1. **Create and start the second multiplayer world in parallel** (e.g. on a headless LAN-Server)
    * Log in as an admin user who is allowed to run commands per sudo
    * Choose a custom name for the second world, e.g. "Second World"
@@ -176,7 +185,7 @@ The following instructions assume that the server script is already downloaded a
      * Backs up all worlds
      * Restarts all running instances
 
-1. **Rollback the last update** (e.g. on a headless LAN-Server)0
+1. **Rollback the last update** (e.g. on a headless LAN-Server)
    * Log in as an admin user who is allowed to run commands per sudo
    * Open a terminal, change to the directory of server.sh, and execute:
      * **sudo ./server.sh rollback**
@@ -193,6 +202,8 @@ The following instructions assume that the server script is already downloaded a
    * Script result:
      * Downlads and installs the desired stable or unstable version (even if already installed)
      * Restarts all running instances
+
+
 
 ## Roadmap
 
