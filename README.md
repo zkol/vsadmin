@@ -59,9 +59,9 @@ For a complete server/client install (option -C) capable to run the client too, 
 
 ### Usage
 
-server.sh [OPTION]... (setup | update | reinstall | rollback)  
-or:  server.sh [OPTION]... (start | stop | restart | status | backup | recover)
-or:  server.sh [OPTION]... command SERVER_COMMAND
+* server.sh [OPTION]... (setup | update | reinstall | rollback) 
+* server.sh [OPTION]... (start | stop | restart | status | backup | recover)
+* server.sh [OPTION]... command SERVER_COMMAND
 
 ### Setup options
 
