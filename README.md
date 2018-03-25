@@ -171,8 +171,8 @@ The following instructions assume that the server script is already downloaded a
    * Log in as an admin user who is allowed to run commands per sudo
    * Know the number or name of the world, e.g. 2 or second-world (otherwise the script checks the instance with the latest start/stop time)
    * Open a terminal, change to the directory of server.sh, and execute for example one of the following commands: 
-     * **sudo ./server.sh -w2 stop (or restart, or backup)**
-     * **sudo ./server.sh -w second-world stop (or restart, or backup)**
+     * **sudo ./server.sh -w2 stop** (or restart, or backup)
+     * **sudo ./server.sh -w second-world stop** (or restart, or backup)
    * Script result:
      * Stops (or restarts, or backs up) the server instance
 
