@@ -9,7 +9,7 @@ Tyron created an initial server script to be shipped with Vintage Story (heavily
 * start, stop, restart the server as daemon (meant to be integrated in the boot process)
 * simple status check of the server daemon
 * console interface to interactive server commands 
-* offline backup of software and wor 
+* offline backup of software and world data
 * clean update and reinstall of Vintage Story versions
 
 Having this features in a shell script, it is important to emphasize that this script was never mandatory to run a Vintage Story server (running mono VintagestoryServer.exe is sufficient)
