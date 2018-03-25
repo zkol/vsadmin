@@ -139,7 +139,8 @@ The following instructions assume that the server script is already downloaded a
 1. Create and start the second multiplayer world in parallel (e.g. on a headless LAN-Server)
    * Log in as an admin user who is allowed to run commands per sudo
    * Choose a custom name for the second world, e.g. "Second World"
-   * Open a terminal, change to the directory of server.sh, and execute: **sudo ./server.sh -w "Second World" -p 47111 start**
+   * Open a terminal, change to the directory of server.sh, and execute:
+     * **sudo ./server.sh -w "Second World" -p 47111 start**
    * Script result:
      * Asks for confirmation to create a new world (if no world is running on port 47111)
      * Creates world folder /var/opt/vintagestory/w02-second-world
