@@ -65,28 +65,28 @@ For a complete server/client install (option -C) capable to run the client too, 
 
 ### Usage
 
-* `server.sh [OPTION]... `(setup | update | reinstall | rollback) 
-* `server.sh [OPTION]... `(start | stop | restart | status | backup | recover)
-* `server.sh [OPTION]... command SERVER_COMMAND`
+* `server.sh [OPTION]... (setup | update | reinstall | rollback) ` 
+* `server.sh [OPTION]... (start | stop | restart | status | backup | recover) `
+* `server.sh [OPTION]... command SERVER_COMMAND `
 
 ### Setup options
 
-` -o OWNER     `Set custom owner name for software setup.
-` -b BASEDIR   `Set custom full directory path for software installation.
-` -d DATADIR   `Set custom full directory path for world data access
-` -C | -R      `Consider complete|reduced package for installation.
+* ` -o OWNER   `  Set custom owner name for software setup.
+* ` -b BASEDIR `  Set custom full directory path for software installation.
+* ` -d DATADIR `  Set custom full directory path for world data access
+* ` -C | -R    `  Consider complete|reduced package for installation.
 
 ### General options
 
-` -v VERSION   `Set reference versionstring (not latest version).
-` -w WORLD     `Set custom world subdirectory for data access.
-` -U | -S      `Consider unstable|stable branch for installation.
-` -T           `Trace script run in test mode (ignoring some checks).
+* ` -v VERSION `  Set reference versionstring (not latest version).
+* ` -w WORLD   `  Set custom world subdirectory for data access.
+* ` -U | -S    `  Consider unstable|stable branch for installation.
+* ` -T         `  Trace script run in test mode (ignoring some checks).
 
 ### Technical options
 
-` -l PID       `Consider the lock that is hold by process id PID
-` -p PORT      `Set custom port to create or import world instances
+* ` -l PID     `  Consider the lock that is hold by process id PID
+* ` -p PORT    `  Set custom port to create or import world instances
 
 ### Server Commands
 
@@ -100,7 +100,7 @@ The following instructions assume that the server script is already downloaded a
    * Check the requirements for a complete install
    * Log in as the user who shall run the client and manage the LAN-Server
    * Open a terminal, change to the directory of server.sh, and execute:
-     * **`./server.sh -C -o $USER setup`**
+     * **` ./server.sh -C -o $USER setup `**
    * Script result:
      * Asks for confirmation to set up the installation with the chosen parameters
      * Downloads and installs latest stable Vintage Story software under base directory /opt/vintagestory/game
@@ -116,7 +116,7 @@ The following instructions assume that the server script is already downloaded a
    * Check the requirements for a reduced install
    * Log in as an admin user who is allowed to run commands per sudo
    * Open a terminal, change to the directory of server.sh, and execute:
-     * **sudo ./server.sh -R setup**
+     * **` sudo ./server.sh -R setup `**
    * Script result:
      * Asks for confirmation to set up the installation with the chosen parameters
      * Prepares system user and system group vintagestory as the software and data owner
@@ -131,7 +131,7 @@ The following instructions assume that the server script is already downloaded a
    * Log in as an admin user who is allowed to run commands per sudo
    * Choose a custom name for the first world, e.g. "Hunger Madness"
    * Open a terminal, change to the directory of server.sh, and execute:
-     * **sudo ./server.sh -w "Hunger Madness" start**
+     * **` sudo ./server.sh -w "Hunger Madness" start `**
    * Script result:
      * Asks for confirmation to create a new world (if no world is running on the default port)
      * Creates world folder /var/opt/vintagestory/w01-hunger-madness
@@ -141,7 +141,7 @@ The following instructions assume that the server script is already downloaded a
 1. **Privilege an admin user for the first world** (e.g. on a headless LAN-Server)
    * Log in as an admin user who is allowed to run commands per sudo
    * Open a terminal, change to the directory of server.sh, and execute:
-     * **sudo ./server.sh -w1 command op alice** (assuming alice is the admin's Vintage Story username)
+     * **` sudo ./server.sh -w1 command op alice `** (assuming alice is the admin's Vintage Story username)
    * Parameter -w is not necessary to address the instance with the lastet start time 
    * Script result:
      * Sends command op to the server
@@ -151,7 +151,7 @@ The following instructions assume that the server script is already downloaded a
    * Log in as an admin user who is allowed to run commands per sudo
    * Choose a custom name for the second world, e.g. "Second World"
    * Open a terminal, change to the directory of server.sh, and execute:
-     * **sudo ./server.sh -w "Second World" -p 47111 start**
+     * **` sudo ./server.sh -w "Second World" -p 47111 start `**
    * Script result:
      * Asks for confirmation to create a new world (if no world is running on port 47111)
      * Creates world folder /var/opt/vintagestory/w02-second-world
@@ -162,8 +162,8 @@ The following instructions assume that the server script is already downloaded a
    * Log in as an admin user who is allowed to run commands per sudo
    * Know the number or name of the world, e.g. 1 or hunger-madness (otherwise the script checks the instance with the latest start/stop time)
    * Open a terminal, change to the directory of server.sh, and execute for example one of the following commands: 
-     * **sudo ./server.sh -w1 status**
-     * **sudo ./server.sh -w hunger-madness status**
+     * **` sudo ./server.sh -w1 status `**
+     * **` sudo ./server.sh -w hunger-madness status `**
    * Script result:
      * Prints the stats for this process
 
@@ -171,15 +171,15 @@ The following instructions assume that the server script is already downloaded a
    * Log in as an admin user who is allowed to run commands per sudo
    * Know the number or name of the world, e.g. 2 or second-world (otherwise the script checks the instance with the latest start/stop time)
    * Open a terminal, change to the directory of server.sh, and execute for example one of the following commands: 
-     * **sudo ./server.sh -w2 stop** (or restart, or backup)
-     * **sudo ./server.sh -w second-world stop** (or restart, or backup)
+     * **` sudo ./server.sh -w2 stop `** (or restart, or backup)
+     * **` sudo ./server.sh -w second-world stop `** (or restart, or backup)
    * Script result:
      * Stops (or restarts, or backs up) the server instance
 
 1. **Update the stable software to the lastest unstable version** (e.g. on a headless LAN-Server)
    * Log in as an admin user who is allowed to run commands per sudo
    * Open a terminal, change to the directory of server.sh, and execute: 
-     * **sudo ./server.sh -U update**
+     * **` sudo ./server.sh -U update `**
    * Script result:
      * Downlads and installs the latest unstable version (if not already installed)
      * Backs up all worlds
@@ -188,7 +188,7 @@ The following instructions assume that the server script is already downloaded a
 1. **Rollback the last update** (e.g. on a headless LAN-Server)
    * Log in as an admin user who is allowed to run commands per sudo
    * Open a terminal, change to the directory of server.sh, and execute:
-     * **sudo ./server.sh rollback**
+     * **` sudo ./server.sh rollback `**
    * Script result:
      * Downlads and installs the latest unstable version (if not already installed)
      * Restarts all running instances
@@ -197,8 +197,8 @@ The following instructions assume that the server script is already downloaded a
    * Log in as an admin user who is allowed to run commands per sudo
    * Know the desired verion number and wether it is stable or untable
    * Open a terminal, change to the directory of server.sh, and execute for example one of the following commands:
-     * **sudo ./server.sh -U -v 1.5.2.3 reinstall**
-     * **sudo ./server.sh -S -v 1.5.1.6 reinstall**
+     * **` sudo ./server.sh -U -v 1.5.2.3 reinstall `**
+     * **` sudo ./server.sh -S -v 1.5.1.6 reinstall `**
    * Script result:
      * Downlads and installs the desired stable or unstable version (even if already installed)
      * Restarts all running instances
@@ -206,7 +206,7 @@ The following instructions assume that the server script is already downloaded a
 1. **Do all this stuff on my local multiplayer LAN-Server**
    * Log in as the user who shall run the client and manage the LAN-Server
    * Open a terminal, change to the directory of server.sh, and execute:
-     * same as above but without sudo: **./server.sh ...**
+     * same as above but without sudo: **` ./server.sh ... `**
    * Script result:
      * same as above, too
 
