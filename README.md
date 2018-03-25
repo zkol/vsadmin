@@ -94,7 +94,7 @@ Try 'server.sh command help' for available server commands.
 
 The following instructions assume that the server script is already downloaded and installed on a Linux server
 
-1. Install Vintage Story on a Linux computer to be used as game client and to share worlds as a multiplayer LAN-Server
+1. **Install Vintage Story to play on Linux and to share worlds as a multiplayer LAN-Server**
    * Check the requirements for a complete install
    * Log in as the user who shall run the client and manage the LAN-Server
    * Open a terminal, change to the directory of server.sh, and execute:
@@ -110,7 +110,7 @@ The following instructions assume that the server script is already downloaded a
    * If you do not like the location of base directory or data directory, please use instead the options -b and -d
      * Run for example: ./server.sh -C -o $USER -b $HOME/vintage/game -d $HOME/vintage/data setup
 
-1. Install Vintage Story on a Linux computer to be used as a headless multiplayer LAN-Server
+1. **Install Vintage Story on Linux as a headless multiplayer LAN-Server**
    * Check the requirements for a reduced install
    * Log in as an admin user who is allowed to run commands per sudo
    * Open a terminal, change to the directory of server.sh, and execute:
@@ -125,7 +125,7 @@ The following instructions assume that the server script is already downloaded a
    * If you do not like the location of base directory or data directory, please use instead the options -b and -d
      * Run for example: sudo ./server.sh -R -b /home/vintage/game -d /home/vintage/data setup
 
-1. Create and start the first multiplayer world (e.g. on a headless LAN-Server)
+1. **Create and start the first multiplayer world** (e.g. on a headless LAN-Server)
    * Log in as an admin user who is allowed to run commands per sudo
    * Choose a custom name for the first world, e.g. "Hunger Madness"
    * Open a terminal, change to the directory of server.sh, and execute:
@@ -136,7 +136,7 @@ The following instructions assume that the server script is already downloaded a
      * Starts the forst server process
      * Prints the stats of the (hopefully sucessful) start of this process
    
-1. Create and start the second multiplayer world in parallel (e.g. on a headless LAN-Server)
+1. **Create and start the second multiplayer world in parallel** (e.g. on a headless LAN-Server)
    * Log in as an admin user who is allowed to run commands per sudo
    * Choose a custom name for the second world, e.g. "Second World"
    * Open a terminal, change to the directory of server.sh, and execute:
@@ -147,7 +147,7 @@ The following instructions assume that the server script is already downloaded a
      * Starts the second server process in parallel
      * Prints the stats of the sucessful start for this process
 
-1. Check the status of a server instance (e.g. on a headless LAN-Server)
+1. **Check the status of a server instance** (e.g. on a headless LAN-Server)
    * Log in as an admin user who is allowed to run commands per sudo
    * Know the number or name of the world, e.g. 1 or hunger-madness (otherwise the script checks the instance with the latest start/stop time)
    * Open a terminal, change to the directory of server.sh, and execute for example one of the following commands: 
@@ -156,7 +156,7 @@ The following instructions assume that the server script is already downloaded a
    * Script result:
      * Prints the stats for this process
 
-1. Stop, restart, or backup a server instance (e.g. on a headless LAN-Server)
+1. **Stop, restart, or backup a server instance** (e.g. on a headless LAN-Server)
    * Log in as an admin user who is allowed to run commands per sudo
    * Know the number or name of the world, e.g. 2 or second-world (otherwise the script checks the instance with the latest start/stop time)
    * Open a terminal, change to the directory of server.sh, and execute for example one of the following commands: 
@@ -165,7 +165,7 @@ The following instructions assume that the server script is already downloaded a
    * Script result:
      * Stops (or restarts, or backs up) the server instance
 
-1. Update the stable software to the lastest unstable version (e.g. on a headless LAN-Server)
+1. **Update the stable software to the lastest unstable version** (e.g. on a headless LAN-Server)
    * Log in as an admin user who is allowed to run commands per sudo
    * Open a terminal, change to the directory of server.sh, and execute for example one of the following commands 
      * **sudo ./server.sh -U update**
