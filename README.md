@@ -141,7 +141,7 @@ The following instructions assume that the server script is already downloaded a
 1. **Privilege an admin user for the first world** (e.g. on a headless LAN-Server)
    * Log in as an admin user who is allowed to run commands per sudo
    * Open a terminal, change to the directory of server.sh, and execute:
-     * **sudo ./server.sh -w1 command op skol** (assuming skol is the Vintage Story username)
+     * **sudo ./server.sh -w1 command op alice** (assuming alice is the admin's Vintage Story username)
    * Parameter -w is not necessary to address the instance with the lastet start time 
    * Script result:
      * Sends command op to the server
@@ -203,7 +203,12 @@ The following instructions assume that the server script is already downloaded a
      * Downlads and installs the desired stable or unstable version (even if already installed)
      * Restarts all running instances
 
-
+1. **Do all this stuff on my local multiplayer LAN-Server**
+   * Log in as the user who shall run the client and manage the LAN-Server
+   * Open a terminal, change to the directory of server.sh, and execute:
+     * same as above but without sudo: **./server.sh ...**
+   * Script result:
+     * same as above, too
 
 ## Roadmap
 
