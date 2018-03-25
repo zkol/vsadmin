@@ -40,7 +40,7 @@ To start, simply download the script
 
 * server.sh
 
-with your POSIX compatible computer into a folder of your choice and make the script excutable (If you do not know how to do this please start reading with https://linuxconfig.org/bash-scripting-tutorial-for-beginners#h7-script-execution).
+with your POSIX compatible computer into a folder of your choice and make the script excutable (If you do not know how to do this please start reading with [this tutorial]https://linuxconfig.org/bash-scripting-tutorial-for-beginners#h7-script-execution).
 
 The script needs as a minimum
 * computer with internet access (at least to set everything up)
@@ -65,32 +65,32 @@ For a complete server/client install (option -C) capable to run the client too, 
 
 ### Usage
 
-* server.sh [OPTION]... (setup | update | reinstall | rollback) 
-* server.sh [OPTION]... (start | stop | restart | status | backup | recover)
-* server.sh [OPTION]... command SERVER_COMMAND
+* `server.sh [OPTION]... `(setup | update | reinstall | rollback) 
+* `server.sh [OPTION]... `(start | stop | restart | status | backup | recover)
+* `server.sh [OPTION]... command SERVER_COMMAND`
 
 ### Setup options
 
-* -o OWNER     Set custom owner name for software setup.
-* -b BASEDIR   Set custom full directory path for software installation.
-* -d DATADIR   Set custom full directory path for world data access
-* -C | -R      Consider complete|reduced package for installation.
+` -o OWNER     `Set custom owner name for software setup.
+` -b BASEDIR   `Set custom full directory path for software installation.
+` -d DATADIR   `Set custom full directory path for world data access
+` -C | -R      `Consider complete|reduced package for installation.
 
 ### General options
 
-* -v VERSION   Set reference versionstring (not latest version).
-* -w WORLD     Set custom world subdirectory for data access.
-* -U | -S      Consider unstable|stable branch for installation.
-* -T           Trace script run in test mode (ignoring some checks).
+` -v VERSION   `Set reference versionstring (not latest version).
+` -w WORLD     `Set custom world subdirectory for data access.
+` -U | -S      `Consider unstable|stable branch for installation.
+` -T           `Trace script run in test mode (ignoring some checks).
 
 ### Technical options
 
-* -l PID       Consider the lock that is hold by process id PID
-* -p PORT      Set custom port to create or import world instances
+` -l PID       `Consider the lock that is hold by process id PID
+` -p PORT      `Set custom port to create or import world instances
 
 ### Server Commands
 
-Try 'server.sh command help' for available server commands.
+Try `server.sh command help` for available server commands.
 
 ## How to
 
@@ -100,7 +100,7 @@ The following instructions assume that the server script is already downloaded a
    * Check the requirements for a complete install
    * Log in as the user who shall run the client and manage the LAN-Server
    * Open a terminal, change to the directory of server.sh, and execute:
-     * **./server.sh -C -o $USER setup**
+     * **`./server.sh -C -o $USER setup`**
    * Script result:
      * Asks for confirmation to set up the installation with the chosen parameters
      * Downloads and installs latest stable Vintage Story software under base directory /opt/vintagestory/game
