@@ -71,22 +71,22 @@ For a complete server/client install (option -C) capable to run the client too, 
 
 ### Setup options
 
- -o OWNER     Set custom owner name for software setup.
- -b BASEDIR   Set custom full directory path for software installation.
- -d DATADIR   Set custom full directory path for world data access.
- -C | -R      Consider complete|reduced package for installation.
+* -o OWNER     Set custom owner name for software setup.
+* -b BASEDIR   Set custom full directory path for software installation.
+* -d DATADIR   Set custom full directory path for world data access
+* -C | -R      Consider complete|reduced package for installation.
 
 ### General options
 
- -v VERSION   Set reference versionstring (not latest version).
- -w WORLD     Set custom world subdirectory for data access.
- -U | -S      Consider unstable|stable branch for installation.
- -T           Trace script run in test mode (ignoring some checks).
+* -v VERSION   Set reference versionstring (not latest version).
+* -w WORLD     Set custom world subdirectory for data access.
+* -U | -S      Consider unstable|stable branch for installation.
+* -T           Trace script run in test mode (ignoring some checks).
 
 ### Technical options
- 
- -l PID       Consider the lock that is hold by process id PID
- -p PORT      Set custom port to create or import world instances
+
+* -l PID       Consider the lock that is hold by process id PID
+* -p PORT      Set custom port to create or import world instances
 
 ### Server Commands
 
