@@ -18,6 +18,8 @@ As the Vintage Story evolved, more and more script features were broken by chang
 
 ## Development Focus
 
+Like Vintage Story this script is in development.
+
 Currently, my main goals are (ordered by priority)
 1. continue Tyrons approach of the script and adapt it according to his wishes
 1. keep it in sync with the evolution of Vintage Story (e.g. stay compatible and make new server features available)
@@ -34,7 +36,7 @@ Currently I take Ubuntu 16.04 LTS as the main reference for development and test
 The server script (server.sh) can be used to set up and manage a Vintage Story installation as well as managing Vintage Story via shell console.
 It is a POSIX shell script, this means everybody can check the source code, nothing is hidden or obscure (provided shell knowlegde is available).
 
-To start, simply download the scipt
+To start, simply download the script
 
 * server.sh
 
@@ -167,11 +169,29 @@ The following instructions assume that the server script is already downloaded a
 
 1. **Update the stable software to the lastest unstable version** (e.g. on a headless LAN-Server)
    * Log in as an admin user who is allowed to run commands per sudo
-   * Open a terminal, change to the directory of server.sh, and execute for example one of the following commands 
+   * Open a terminal, change to the directory of server.sh, and execute: 
      * **sudo ./server.sh -U update**
    * Script result:
      * Downlads and installs the latest unstable version (if not already installed)
      * Backs up all worlds
+     * Restarts all running instances
+
+1. **Rollback the last update** (e.g. on a headless LAN-Server)0
+   * Log in as an admin user who is allowed to run commands per sudo
+   * Open a terminal, change to the directory of server.sh, and execute:
+     * **sudo ./server.sh rollback**
+   * Script result:
+     * Downlads and installs the latest unstable version (if not already installed)
+     * Restarts all running instances
+
+1. **Downgrade to a specific software version** (e.g. on a headless LAN-Server)
+   * Log in as an admin user who is allowed to run commands per sudo
+   * Know the desired verion number and wether it is stable or untable
+   * Open a terminal, change to the directory of server.sh, and execute for example one of the following commands:
+     * **sudo ./server.sh -U -v 1.5.2.3 reinstall**
+     * **sudo ./server.sh -S -v 1.5.1.6 reinstall**
+   * Script result:
+     * Downlads and installs the desired stable or unstable version (even if already installed)
      * Restarts all running instances
 
 ## Roadmap
