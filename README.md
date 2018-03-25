@@ -34,9 +34,11 @@ Currently I take Ubuntu 16.04 LTS as the main reference for development and test
 The server script (server.sh) can be used to set up and manage a Vintage Story installation as well as managing Vintage Story via shell console.
 It is a POSIX shell script, this means everybody can check the source code, nothing is hidden or obscure (provided shell knowlegde is available).
 
-To start, simply download the scipt 
+To start, simply download the scipt
+
 * server.sh
-on your POSIX compatible computer to a folder of your choice and make the script excutable (If you do not know how to do this please start reading with https://linuxconfig.org/bash-scripting-tutorial-for-beginners#h7-script-execution)
+
+with your POSIX compatible computer into a folder of your choice and make the script excutable (If you do not know how to do this please start reading with https://linuxconfig.org/bash-scripting-tutorial-for-beginners#h7-script-execution).
 
 The script needs as a minimum
 * computer with internet access (at least to set everything up)
@@ -95,7 +97,8 @@ The following instructions assume that the server script is already downloaded a
 1. Install Vintage Story on a Linux computer to be used as game client and to share worlds as a multiplayer LAN-Server
    * Check the requirements for a complete install
    * Log in as the user who shall run the client and manage the LAN-Server
-   * Open a terminal, change to the directory of server.sh, and execute: ./server.sh -C -o $USER setup
+   * Open a terminal, change to the directory of server.sh, and execute:
+     * **./server.sh -C -o $USER setup**
    * Script result:
      * Asks for confirmation to set up the installation with the chosen parameters
      * Downloads and installs latest stable Vintage Story software under base directory /opt/vintagestory/game
@@ -110,7 +113,8 @@ The following instructions assume that the server script is already downloaded a
 1. Install Vintage Story on a Linux computer to be used as a headless multiplayer LAN-Server
    * Check the requirements for a reduced install
    * Log in as an admin user who is allowed to run commands per sudo
-   * Open a terminal, change to the directory of server.sh, and execute: sudo ./server.sh -R setup
+   * Open a terminal, change to the directory of server.sh, and execute:
+     * **sudo ./server.sh -R setup**
    * Script result:
      * Asks for confirmation to set up the installation with the chosen parameters
      * Prepares system user and system group vintagestory as the software and data owner
@@ -124,7 +128,8 @@ The following instructions assume that the server script is already downloaded a
 1. Create and start the first multiplayer world (e.g. on a headless LAN-Server)
    * Log in as an admin user who is allowed to run commands per sudo
    * Choose a custom name for the first world, e.g. "Hunger Madness"
-   * Open a terminal, change to the directory of server.sh, and execute: sudo ./server.sh -w "Hunger Madness" start
+   * Open a terminal, change to the directory of server.sh, and execute:
+     * **sudo ./server.sh -w "Hunger Madness" start**
    * Script result:
      * Asks for confirmation to create a new world (if no world is running on the default port)
      * Creates world folder /var/opt/vintagestory/w01-hunger-madness
@@ -134,7 +139,7 @@ The following instructions assume that the server script is already downloaded a
 1. Create and start the second multiplayer world in parallel (e.g. on a headless LAN-Server)
    * Log in as an admin user who is allowed to run commands per sudo
    * Choose a custom name for the second world, e.g. "Second World"
-   * Open a terminal, change to the directory of server.sh, and execute: sudo ./server.sh -w "Second World" -p 47111 start
+   * Open a terminal, change to the directory of server.sh, and execute: **sudo ./server.sh -w "Second World" -p 47111 start**
    * Script result:
      * Asks for confirmation to create a new world (if no world is running on port 47111)
      * Creates world folder /var/opt/vintagestory/w02-second-world
@@ -144,25 +149,25 @@ The following instructions assume that the server script is already downloaded a
 1. Check the status of a server instance (e.g. on a headless LAN-Server)
    * Log in as an admin user who is allowed to run commands per sudo
    * Know the number or name of the world, e.g. 1 or hunger-madness (otherwise the script checks the instance with the latest start/stop time)
-   * Open a terminal, change to the directory of server.sh, and execute for example one of the following commands 
-     * sudo ./server.sh -w1 status
-     * sudo ./server.sh -w hunger-madness status
+   * Open a terminal, change to the directory of server.sh, and execute for example one of the following commands: 
+     * **sudo ./server.sh -w1 status**
+     * **sudo ./server.sh -w hunger-madness status**
    * Script result:
      * Prints the stats for this process
 
 1. Stop, restart, or backup a server instance (e.g. on a headless LAN-Server)
    * Log in as an admin user who is allowed to run commands per sudo
    * Know the number or name of the world, e.g. 2 or second-world (otherwise the script checks the instance with the latest start/stop time)
-   * Open a terminal, change to the directory of server.sh, and execute for example one of the following commands 
-     * sudo ./server.sh -w2 stop (or restart, or backup)
-     * sudo ./server.sh -w second-world stop (or restart, or backup)
+   * Open a terminal, change to the directory of server.sh, and execute for example one of the following commands: 
+     * **sudo ./server.sh -w2 stop (or restart, or backup)**
+     * **sudo ./server.sh -w second-world stop (or restart, or backup)**
    * Script result:
      * Stops (or restarts, or backs up) the server instance
 
 1. Update the stable software to the lastest unstable version (e.g. on a headless LAN-Server)
    * Log in as an admin user who is allowed to run commands per sudo
    * Open a terminal, change to the directory of server.sh, and execute for example one of the following commands 
-     * sudo ./server.sh -U update
+     * **sudo ./server.sh -U update**
    * Script result:
      * Downlads and installs the latest unstable version (if not already installed)
      * Backs up all worlds
