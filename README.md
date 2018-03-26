@@ -39,7 +39,8 @@ It is a POSIX shell script, this means everybody can check the source code, noth
 To start, simply download the setup script with your POSIX compatible computer into a folder of your choice:
 * open a terminal, change to the desired directory, and execute:
   * **` wget https://raw.githubusercontent.com/zkol/vsadmin/master/server.sh `**
-Don't forget to make the script excutable (if you do not know how to do this please start reading with [this tutorial](https://linuxconfig.org/bash-scripting-tutorial-for-beginners#h7-script-execution)).
+* make the script excutable the first time (if you do not know how to do this please start reading with [this tutorial](https://linuxconfig.org/bash-scripting-tutorial-for-beginners#h7-script-execution)).
+You can also update the setup script this way.
 
 The script needs as a minimum
 * computer with internet access (at least to set everything up)
