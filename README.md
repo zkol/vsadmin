@@ -1,10 +1,10 @@
 # VSadmin
 
-This repository contains admin scripts for Vintage Story (see [homepage!](https://www.vintagestory.at) if you want to learn about Vintage Story). 
+This repository contains admin scripts for Vintage Story (see [homepage](https://www.vintagestory.at) if you want to learn about Vintage Story). 
 
 ## History
 
-Tyron created an initial server script to be shipped with Vintage Story (heavily adapted from [minecraft tutorials!](http://minecraft.gamepedia.com/Tutorials/Server_startup_script)). His idea was to provide a shell script for setting up a Vintage Story Multiplayer server on a Linux based host via terminal commands, especially mentioned as a quick start for users that are not familiar with creating their own scripts. This server script was not mentioned as a production ready hosting solution and had the following (limited) features:
+Tyron created an initial server script to be shipped with Vintage Story (heavily adapted from [minecraft tutorials](http://minecraft.gamepedia.com/Tutorials/Server_startup_script)). His idea was to provide a shell script for setting up a Vintage Story Multiplayer server on a Linux based host via terminal commands, especially mentioned as a quick start for users that are not familiar with creating their own scripts. This server script was not mentioned as a production ready hosting solution and had the following (limited) features:
 
 * start, stop, restart the server as daemon (meant to be integrated in the boot process)
 * simple status check of the server daemon
@@ -40,7 +40,7 @@ To start, simply download the script
 
 * server.sh
 
-with your POSIX compatible computer into a folder of your choice and make the script excutable (If you do not know how to do this please start reading with [this tutorial!](https://linuxconfig.org/bash-scripting-tutorial-for-beginners#h7-script-execution)).
+with your POSIX compatible computer into a folder of your choice and make the script excutable (If you do not know how to do this please start reading with [this tutorial](https://linuxconfig.org/bash-scripting-tutorial-for-beginners#h7-script-execution)).
 
 The script needs as a minimum
 * computer with internet access (at least to set everything up)
