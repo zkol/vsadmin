@@ -40,6 +40,7 @@ To start, simply download the setup script with your POSIX compatible computer i
 * open a terminal, change to the desired directory, and execute:
   * **` wget https://raw.githubusercontent.com/zkol/vsadmin/master/server.sh `**
 * make the script excutable the first time (if you do not know how to do this please start reading with [this tutorial](https://linuxconfig.org/bash-scripting-tutorial-for-beginners#h7-script-execution)).
+
 You can also update the setup script this way.
 
 The script needs as a minimum
