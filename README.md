@@ -98,9 +98,9 @@ The following instructions assume that the server script is already downloaded a
 
 1. **Install Vintage Story to play on Linux and to share worlds with a local multiplayer LAN-Server**
    * Check the requirements for a complete install
-   * Log in as the user who shall run the client and manage the LAN-Server
+   * Log in as the user who shall run the client on his desktop and manage the LAN-Server (and should be able to perform sudo)
    * Open a terminal, change to the directory of server.sh, and execute:
-     * **` ./server.sh -C -o $USER setup `**
+     * **` sudo ./server.sh -C -o $USER setup `**
    * Script result:
      * Asks for confirmation to set up the installation with the chosen parameters
      * Downloads and installs latest stable Vintage Story software under base directory /opt/vintagestory/game
