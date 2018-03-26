@@ -36,11 +36,10 @@ Currently I take Ubuntu 16.04 LTS as the main reference for development and test
 The server script (server.sh) can be used to set up and manage a Vintage Story installation as well as managing Vintage Story via shell console.
 It is a POSIX shell script, this means everybody can check the source code, nothing is hidden or obscure (provided shell knowlegde is available).
 
-To start, simply download the script
-
-* server.sh
-
-with your POSIX compatible computer into a folder of your choice and make the script excutable (If you do not know how to do this please start reading with [this tutorial](https://linuxconfig.org/bash-scripting-tutorial-for-beginners#h7-script-execution)).
+To start, simply download the setup script with your POSIX compatible computer into a folder of your choice:
+* open a terminal, change to the desired directory, and execute:
+  * **` wget https://raw.githubusercontent.com/zkol/vsadmin/master/server.sh `**
+Don't forget to make the script excutable (if you do not know how to do this please start reading with [this tutorial](https://linuxconfig.org/bash-scripting-tutorial-for-beginners#h7-script-execution)).
 
 The script needs as a minimum
 * computer with internet access (at least to set everything up)
