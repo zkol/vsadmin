@@ -190,6 +190,7 @@ The following instructions assume that the server script is already downloaded a
    * Open a terminal, change to the directory of server.sh, and execute:
      * **` sudo ./server.sh rollback `**
    * Script result:
+     * Asks for confirmation to rollback the last installation (if no world is running on the default port)
      * Downlads and installs the latest unstable version (if not already installed)
      * Restarts all running instances
 
@@ -201,6 +202,7 @@ The following instructions assume that the server script is already downloaded a
      * **` sudo ./server.sh -S -v 1.5.1.6 reinstall `**
    * Script result:
      * Downlads and installs the desired stable or unstable version (even if already installed)
+     * Backs up all worlds
      * Restarts all running instances
 
 1. **Do all this stuff on my local multiplayer LAN-Server**
