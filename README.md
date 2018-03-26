@@ -110,7 +110,7 @@ The following instructions assume that the server script is already downloaded a
      * Location for single player worlds will be standard $HOME/.config/VintagestoryData
      * Setup offers interacive option to move existing worlds in /var, /opt, and /home to the new server data location (except single player worlds in $HOME/.config/VintagestoryData and $HOME/ApplicationData) 
    * If you do not like the location of base directory or data directory, please use instead the options -b and -d
-     * Run for example: ./server.sh -C -o $USER -b $HOME/vintage/game -d $HOME/vintage/data setup
+     * Run for example: **` ./server.sh -C -o $USER -b $HOME/vintage/game -d $HOME/vintage/data setup `**
 
 1. **Install Vintage Story on Linux as a headless multiplayer LAN-Server**
    * Check the requirements for a reduced install
@@ -125,7 +125,7 @@ The following instructions assume that the server script is already downloaded a
      * Log files can be found under /var/log/vintagestory too
      * Setup offers interacive option to move existing worlds in /var, /opt, and /home to the new server data location (except worlds in /home/vintagestory/.config/VintagestoryData and /home/vintagestory/ApplicationData) 
    * If you do not like the location of base directory or data directory, please use instead the options -b and -d
-     * Run for example: sudo ./server.sh -R -b /home/vintage/game -d /home/vintage/data setup
+     * Run for example: **` sudo ./server.sh -R -b /home/vintage/game -d /home/vintage/data setup `**
 
 1. **Create and start the first multiplayer world** (e.g. on a headless LAN-Server)
    * Log in as an admin user who is allowed to run commands per sudo
