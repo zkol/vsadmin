@@ -1,6 +1,6 @@
 #!/bin/sh
 # /etc/init.d/vintagestory.sh
-# version 1.5.1.3 2018-03-23 (YYYY-MM-DD)
+# version 1.5.1.4 2018-03-26 (YYYY-MM-DD)
 #
 ### BEGIN INIT INFO
 # Provides:   vintagestory
@@ -90,7 +90,11 @@
 #            Tweak: lowered the required screen version and rephrased abort message (that already allows to continue anyway).
 #            Tweak: option to continue even on installation inconsistency (considering messing up by manual installation)
 #            Tweak: more verbose output to the syslog facility
-#
+# 2018-03-26 Script version 1.5.1.4
+#            Fixed: Removed user switch related to exit E#24 (user switch is not needed and in some constellations not possible)
+#            Fixed: \n output with some shell implementations (special printf handling for log output that may contain % characters)
+#            
+
 
 #######################################
 # Standard output (logger) and exit
@@ -114,19 +118,19 @@ vs_out() {
   if [ -n "${msg}" ] ; then
     case ${ret} in    
      -1) logger -p user.debug   -t "${0##*/}[$$]" "(${me})  <debug> ${msg}${abort}"
-         [ ${ret} -ge ${VS_LVL:=0} ]    && printf   "<debug> %s\n" "${msg}${abort}" 
+         [ ${ret} -ge ${VS_LVL:=0} ]    && printf   "<debug> ${msg}${abort}\n" 
          ret=0 ;;  
       0) logger -p user.info    -t "${0##*/}[$$]" "(${me})  <info>  ${msg}${abort}"
-         printf   "<info>  %s\n" "${msg}${abort}"
+         printf   "<info>  ${msg}${abort}\n"
                ;;  
       1) logger -p user.warning -t "${0##*/}[$$]" "(${me})  <warn>  ${msg}${abort}"
-         [ ${ret} -ge ${VS_LVL:=0} ]    && printf   "<warn>  %s\n" "${msg}${abort}" >&2
+         [ ${ret} -ge ${VS_LVL:=0} ]    && printf   "<warn>  ${msg}${abort}\n"  >&2
                ;;
       2) logger -p user.error   -t "${0##*/}[$$]" "(${me})  <error> ${msg}${abort}"
-         [ ${ret} -ge ${VS_LVL:=0} ]    && printf "\n<error> %s\n" "${msg}${abort}" >&2
+         [ ${ret} -ge ${VS_LVL:=0} ]    && printf "\n<error> ${msg}${abort}\n"  >&2
                ;;
       *) logger -p user.crit    -t "${0##*/}[$$]" "(${me})  <fatal> ${msg}${abort}"
-         printf "\n<fatal> %s\n" "${msg}${abort}" >&2
+         printf "\n<fatal> ${msg}${abort}\n" >&2
                ;;
     esac
   fi
@@ -286,7 +290,7 @@ vs_get_status() {
     elif [ -z "${_stat_msg}" ] ; then
       val=2; [ -z "${var}" ] && vs_out "${inst} (to be ${target_status:-STOPPED}) is running but not responding" ${val}
     else   # in quiet mode we want only one output line (only one status code)
-      [ -z "${var}" ] && vs_out "Server response\n\n${_stat_msg##*] }\n"
+      [ -z "${var}" ] && vs_out "$(printf "Server response\n\n%s\n " "${_stat_msg##*] }")"
       [ -n "${run_info#*:}" -a "${run_info#*:}" != "${_VER}" ] && target_status="RESTARTED with new v${_VER}" 
       [ -z "${var}" ] && vs_out "${inst} (to be ${target_status:-STOPPED}) is up and running" ${val} 
     fi
@@ -1039,7 +1043,7 @@ vs_set_env() {
   local i="$(cat ${VS_PID} 2>/dev/null)"; local p="(${0##*/}|vs-.*)"; local err
   if [ ${i:-$$} -ne ${6:-0} ] ; then
     [ ${i:-$$} -ne $$ -a -n "$(pgrep -f "${p}" -F "${VS_PID}" 2>/dev/null)" ]  && vs_out -a "${0##*/} was temporarily locked by another VS command" 1
-    vs_user "printf '$$' > '${VS_PID}'"                                        || vs_out -a "Unexpected condition E#24 (user was not able to create pidfile '${VS_PID}')" 3
+    printf "$$" > "${VS_PID}"                                                  || vs_out -a "Unexpected condition E#24 (user was not able to create pidfile '${VS_PID}')" 3
     [ "$(cat ${VS_PID} 2>/dev/null)" = "$$" ]                                  || vs_out -a "${0##*/} is temporarily locked by another VS command" 1
     [ -d "${VS_BAS}" ]                      || err=" dir ${VS_BAS}"
     [ -f "${VS_BAS}/${VS_BIN}" ]            || err="${err} bin ${VS_BIN}"
