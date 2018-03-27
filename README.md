@@ -206,7 +206,7 @@ The following instructions assume that the **server script** is already download
      * Backs up all worlds
      * Restarts all running instances
 
-1. **Do tasks above with the local setup that is described in point 1** (e.g. on a desktop gaming computer)
+1. **Above tasks with local setup described in point 1** (e.g. on a desktop gaming computer)
    * Assumed you are already logged in as the user who shall run the client and manage the LAN-Server
    * Open a terminal, change to the directory of server.sh, and execute:
      * same as above but without sudo: **` ./server.sh ... `**
