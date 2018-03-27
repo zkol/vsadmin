@@ -230,7 +230,7 @@ This is a list of potential topics for the next script versions.
 1. Add options to repair/cleanup/uninstall for old/failed installs (searching the file system for Vintage Story binaries)
 1. Provide option to start/stop all registered parallel instances with one command (including option to list this instances)
 1. Improve trace feature as well as error-code systematics and documentation (trace could be selective by providing a previous error code)
-1. Test and document how to setup the OS to autmatically restart the server on a failure
+1. Test and document how to setup the server host OS to automatically restart the server in the case of a failure
 
 ### Prio 3
 1. Better portability of used shell tools (e.g. alternative to the find -printf feature)
