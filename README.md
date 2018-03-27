@@ -89,9 +89,9 @@ For a complete server/client install (option -C) capable to run the client too, 
 * ` -l PID     `  Consider the lock that is hold by process id PID
 * ` -p PORT    `  Set custom port to create or import world instances
 
-### Server Commands
+### Server Administration Commands
 
-Try `server.sh command help` for available server commands.
+Try `server.sh command help` for available server admin commands.
 
 ## How to
 
