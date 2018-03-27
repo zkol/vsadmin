@@ -14,7 +14,7 @@ Tyron created an initial server script to be shipped with Vintage Story (heavily
 
 Having this features in a shell script, it is important to emphasize that this script was never mandatory to run a Vintage Story server (running mono VintagestoryServer.exe is sufficient)
 
-As the Vintage Story evolved, more and more script features were broken by changes in VintagestoryServer.exe and Tyron had no time to fix the usablitity and compatibilty issues that were reported. So he asked me if I could help and fix the script. Working on the development priorities 1-4 (see below), I reached step by step the point, where I felt it necessary to refactore the script in order to manage the switch from Vintage Story versions 1.4.9 to 1.5.1. In consequence, Tyron asked me to set up a git repository to access script code (and documentation).
+As the Vintage Story evolved quickly, more and more script features were broken by changes in VintagestoryServer.exe and Tyron had no time to fix the usablitity and compatibilty issues that were reported. So in January 2018 he asked me if I could help and fix the script. Working on the development priorities 1-4 (see below) and with respect to the configuration options demanded by the community, I did more and more small fixes and reached step by step the point, where I felt it necessary to refactor the script, especially to manage the changes made between Vintage Story versions 1.4.9 to 1.5.1. The refactoring started in February 2018, the first step was finished in the beginning or March. But there are further steps to be done, yet. In consequence, Tyron asked me to set up a git repository to access script code (and documentation).
 
 ## Development Focus
 
