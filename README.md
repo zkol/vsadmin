@@ -100,7 +100,7 @@ The following instructions assume that the **server script** is already download
 1. **Install Vintage Story to play on Linux and to share worlds with a local multiplayer LAN-Server**
    * Check the requirements for a complete install
    * Log in as the user who shall run the client on his desktop and manage the LAN-Server (and should be able to perform sudo)
-   * Open a terminal, change to the directory of server.sh, and execute:
+   * Open a terminal window, change to the directory of server.sh, and execute:
      * **` sudo ./server.sh -C -o $USER setup `**
    * Script result:
      * Asks for confirmation to set up the installation with the chosen parameters
@@ -115,8 +115,8 @@ The following instructions assume that the **server script** is already download
 
 1. **Install Vintage Story on Linux as a headless multiplayer LAN-Server**
    * Check the requirements for a reduced install
-   * Log in as an admin user who is allowed to run commands per sudo
-   * Open a terminal, change to the directory of server.sh, and execute:
+   * Log in as an admin user who is allowed to run sudo commands (per terminal)
+   * Change to the directory of server.sh, and execute:
      * **` sudo ./server.sh -R setup `**
    * Script result:
      * Asks for confirmation to set up the installation with the chosen parameters
@@ -129,9 +129,9 @@ The following instructions assume that the **server script** is already download
      * Run for example: **` sudo ./server.sh -R -b /home/vintage/game -d /home/vintage/data setup `**
 
 1. **Create and start the first multiplayer world** (e.g. on a headless LAN-Server)
-   * Log in as an admin user who is allowed to run commands per sudo
+   * Log in as an admin user who is allowed to run sudo commands (per terminal)
    * Choose a custom name for the first world, e.g. "Hunger Madness"
-   * Open a terminal, change to the directory of server.sh, and execute:
+   * Change to the directory of server.sh, and execute:
      * **` sudo ./server.sh -w "Hunger Madness" start `**
    * Script result:
      * Asks for confirmation to create a new world (if no world is running on the default port)
@@ -140,8 +140,8 @@ The following instructions assume that the **server script** is already download
      * Prints the stats of the (hopefully sucessful) start of this process
 
 1. **Privilege an admin user for the first world** (e.g. on a headless LAN-Server)
-   * Log in as an admin user who is allowed to run commands per sudo
-   * Open a terminal, change to the directory of server.sh, and execute:
+   * Log in as an admin user who is allowed to run sudo commands (per terminal)
+   * Change to the directory of server.sh, and execute:
      * **` sudo ./server.sh -w1 command op alice `** (assuming alice is the admin's Vintage Story username)
    * Parameter -w is not necessary to address the instance with the lastet start time 
    * Script result:
@@ -149,9 +149,9 @@ The following instructions assume that the **server script** is already download
      * Prints the command result (that has been logged by the server)
      
 1. **Create and start the second multiplayer world in parallel** (e.g. on a headless LAN-Server)
-   * Log in as an admin user who is allowed to run commands per sudo
+   * Log in as an admin user who is allowed to run sudo commands (per terminal)
    * Choose a custom name for the second world, e.g. "Second World"
-   * Open a terminal, change to the directory of server.sh, and execute:
+   * Change to the directory of server.sh, and execute:
      * **` sudo ./server.sh -w "Second World" -p 47111 start `**
    * Script result:
      * Asks for confirmation to create a new world (if no world is running on port 47111)
@@ -160,7 +160,7 @@ The following instructions assume that the **server script** is already download
      * Prints the stats of the sucessful start for this process
 
 1. **Check the status of a server instance** (e.g. on a headless LAN-Server)
-   * Log in as an admin user who is allowed to run commands per sudo
+   * Log in as an admin user who is allowed to run sudo commands (per terminal)
    * Know the number or name of the world, e.g. 1 or hunger-madness (otherwise the script checks the instance with the latest start/stop time)
    * Open a terminal, change to the directory of server.sh, and execute for example one of the following commands: 
      * **` sudo ./server.sh -w1 status `**
@@ -169,17 +169,17 @@ The following instructions assume that the **server script** is already download
      * Prints the stats for this process
 
 1. **Stop, restart, or backup a server instance** (e.g. on a headless LAN-Server)
-   * Log in as an admin user who is allowed to run commands per sudo
+   * Log in as an admin user who is allowed to run sudo commands (per terminal)
    * Know the number or name of the world, e.g. 2 or second-world (otherwise the script checks the instance with the latest start/stop time)
-   * Open a terminal, change to the directory of server.sh, and execute for example one of the following commands: 
+   * Change to the directory of server.sh, and execute for example one of the following commands: 
      * **` sudo ./server.sh -w2 stop `** (or restart, or backup)
      * **` sudo ./server.sh -w second-world stop `** (or restart, or backup)
    * Script result:
      * Stops (or restarts, or backs up) the server instance
 
 1. **Update the stable software to the lastest unstable version** (e.g. on a headless LAN-Server)
-   * Log in as an admin user who is allowed to run commands per sudo
-   * Open a terminal, change to the directory of server.sh, and execute: 
+   * Log in as an admin user who is allowed to run sudo commands (per terminal)
+   * Change to the directory of server.sh, and execute: 
      * **` sudo ./server.sh -U update `**
    * Script result:
      * Downlads and installs the latest unstable version (if not already installed)
@@ -187,8 +187,8 @@ The following instructions assume that the **server script** is already download
      * Restarts all running instances
 
 1. **Rollback the last update** (e.g. on a headless LAN-Server)
-   * Log in as an admin user who is allowed to run commands per sudo
-   * Open a terminal, change to the directory of server.sh, and execute:
+   * Log in as an admin user who is allowed to run sudo commands (per terminal)
+   * Change to the directory of server.sh, and execute:
      * **` sudo ./server.sh rollback `**
    * Script result:
      * Asks for confirmation to rollback the last installation (if no world is running on the default port)
@@ -196,9 +196,9 @@ The following instructions assume that the **server script** is already download
      * Restarts all running instances
 
 1. **Downgrade to a specific software version** (e.g. on a headless LAN-Server)
-   * Log in as an admin user who is allowed to run commands per sudo
+   * Log in as an admin user who is allowed to run sudo commands (per terminal)
    * Know the desired verion number and wether it is stable or untable
-   * Open a terminal, change to the directory of server.sh, and execute for example one of the following commands:
+   * Change to the directory of server.sh, and execute for example one of the following commands:
      * **` sudo ./server.sh -U -v 1.5.2.3 reinstall `**
      * **` sudo ./server.sh -S -v 1.5.1.6 reinstall `**
    * Script result:
@@ -208,7 +208,7 @@ The following instructions assume that the **server script** is already download
 
 1. **Above tasks with local setup described in point 1** (e.g. on a desktop gaming computer)
    * Assumed you are already logged in as the user who shall run the client and manage the LAN-Server
-   * Open a terminal, change to the directory of server.sh, and execute:
+   * Open a terminal window, change to the directory of server.sh, and execute:
      * same as above but without sudo: **` ./server.sh ... `**
    * Script result:
      * same as above, too
