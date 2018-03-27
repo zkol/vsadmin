@@ -95,7 +95,7 @@ Try `server.sh command help` for available server admin commands.
 
 ## How to
 
-The following instructions assume that the server script is already downloaded and installed on a Linux server
+The following instructions assume that the **server script** is already downloaded and installed on a Linux server
 
 1. **Install Vintage Story to play on Linux and to share worlds with a local multiplayer LAN-Server**
    * Check the requirements for a complete install
@@ -206,8 +206,8 @@ The following instructions assume that the server script is already downloaded a
      * Backs up all worlds
      * Restarts all running instances
 
-1. **Do all this stuff on my local multiplayer LAN-Server**
-   * Log in as the user who shall run the client and manage the LAN-Server
+1. **Do tasks above with the local setup that is described in point 1** (e.g. on a desktop gaming computer)
+   * Assumed you are already logged in as the user who shall run the client and manage the LAN-Server
    * Open a terminal, change to the directory of server.sh, and execute:
      * same as above but without sudo: **` ./server.sh ... `**
    * Script result:
