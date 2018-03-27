@@ -244,7 +244,7 @@ This is a list of potential topics for the next script versions.
 This script relies on some environment parameters: 
 1. a bit of meta data to define which custom locations were chosen and which stable/unstable package has been installed
 1. a naming convention to manage different datafolders with the means of a shell script
-1. the inital setup that defined the parameters (and saved them to either /etc/opt/vintagestory or a local ./.etc file)
+1. an inital setup that defined and persisted the configurable environment parameters (and saved them to either /etc/opt/vintagestory or a local $HOME/.vintagestory file)
 1. the success of a integrity check that is performed on each script use
 
 This means manual moving and renaming will most probably mess up everything (means the script complains). 
