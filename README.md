@@ -213,6 +213,26 @@ The following instructions assume that the **server script** is already download
    * Script result:
      * same as above, too
 
+1. **Set up a multiple version environment** (e.g. production/test version parallel)
+   * Assumed there is already a default stable installation (owner vintagestory and basedir /opt/vintagestory/game) to be kept as production environment)
+   * Log in as an admin user who is allowed to run sudo commands (per terminal)
+   * Change to the directory of server.sh, and execute:
+     * **` sudo cp -pf /etc/opt/vintagestory /opt/vintagestory/.vintagestory.prod `**
+   * Set up new unstable test environment (for safety existing environment should be stopped before)
+     * **` sudo ./server.sh stop `** (use -w parameter to specify the running instances if there are more than one)
+     * **` sudo ./server.sh -U -b /opt/vintagestory/test setup `**
+   * Link the producion configuration to the corresponding server script
+     * **` sudo ln -sf /opt/vintagestory/.vintagestory.prod ./.etc `**
+   * Result:
+     * Stops the instances that are currently running
+     * Saves the production configuration from being overwritten by a test installation
+     * Asks for confirmation to set up the test installation with the chosen parameters
+     * Downloads and installs latest ustable Vintage Story software under new base directory /opt/vintagestory/test
+     * Does not change data directory (but performs a backup of the existing data)
+     * Both environments can be maintained (e.g. updated) independently, but you must always ensure to change to the production dir /opt/vintagestory/game when maintaining the production environment, otherwise the test environment would be affected.
+   * Hint:
+     * To run the test environment in parallel, you must use a world configuration with a different port (e.g. the second world in the example above)
+
 ## Roadmap
 
 This is a list of potential topics for the next script versions.
