@@ -223,6 +223,7 @@ This is a list of potential topics for the next script versions.
 1. Replace screen, instead start the daemon by POSIX shell commands, improve force stop/restart feature (in the case of a not responsive server status)
 1. Replace host existing connect test (by using a openssl command sequence) with wget-based connection test (eliminate openssl dependency)
 1. Better documentation of minimal server requirements as well as refinement of requirement checks
+1. Currently the setup task relocates the installation to the desired location be doing simply a full reinstall (including a download). This might confuse a more experienced user who already created and installed everything manually. The setup task should consider that no relocation and reinstall is needed, doing only a reconfiguration according to the passed setup parameters.
 
 ### Prio 2
 1. Reduce the dependency on naming conventions, to provide a better interface to other server management tools (e.g. web GUI written by other community members)
