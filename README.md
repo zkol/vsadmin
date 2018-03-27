@@ -98,8 +98,8 @@ Try `server.sh command help` for available server admin commands.
 The following instructions assume that the **server script** is already downloaded and installed on a Linux server
 
 1. **Install Vintage Story to play on Linux and to share worlds with a local multiplayer LAN-Server**
-   * Check the requirements for a complete install
-   * Log in as the user who shall run the client on his desktop and manage the LAN-Server (and should be able to perform sudo)
+   * Check the requirements for a complete install.
+   * Log in as the user who shall run the client on his desktop and manage the LAN-Server (and should be able to perform sudo).
    * Open a terminal window, change to the directory of server.sh, and execute:
      * **` sudo ./server.sh -C -o $USER setup `**
    * Script result:
@@ -114,8 +114,8 @@ The following instructions assume that the **server script** is already download
      * Run for example: **` ./server.sh -C -o $USER -b $HOME/vintage/game -d $HOME/vintage/data setup `**
 
 1. **Install Vintage Story on Linux as a headless multiplayer LAN-Server**
-   * Check the requirements for a reduced install
-   * Log in as an admin user who is allowed to run sudo commands (per terminal)
+   * Check the requirements for a reduced install.
+   * Log in as an admin user who is allowed to run sudo commands (per terminal).
    * Change to the directory of server.sh, and execute:
      * **` sudo ./server.sh -R setup `**
    * Script result:
@@ -129,8 +129,8 @@ The following instructions assume that the **server script** is already download
      * Run for example: **` sudo ./server.sh -R -b /home/vintage/game -d /home/vintage/data setup `**
 
 1. **Create and start the first multiplayer world** (e.g. on a headless LAN-Server)
-   * Log in as an admin user who is allowed to run sudo commands (per terminal)
-   * Choose a custom name for the first world, e.g. "Hunger Madness"
+   * Log in as an admin user who is allowed to run sudo commands (per terminal).
+   * Choose a custom name for the first world, e.g. "Hunger Madness".
    * Change to the directory of server.sh, and execute:
      * **` sudo ./server.sh -w "Hunger Madness" start `**
    * Script result:
@@ -140,17 +140,17 @@ The following instructions assume that the **server script** is already download
      * Prints the stats of the (hopefully sucessful) start of this process
 
 1. **Privilege an admin user for the first world** (e.g. on a headless LAN-Server)
-   * Log in as an admin user who is allowed to run sudo commands (per terminal)
+   * Log in as an admin user who is allowed to run sudo commands (per terminal).
    * Change to the directory of server.sh, and execute:
      * **` sudo ./server.sh -w1 command op alice `** (assuming alice is the admin's Vintage Story username)
-   * Parameter -w is not necessary to address the instance with the lastet start time 
+   * Parameter -w is not necessary to address the instance with the lastet start time.
    * Script result:
      * Sends command op to the server
      * Prints the command result (that has been logged by the server)
      
 1. **Create and start the second multiplayer world in parallel** (e.g. on a headless LAN-Server)
-   * Log in as an admin user who is allowed to run sudo commands (per terminal)
-   * Choose a custom name for the second world, e.g. "Second World"
+   * Log in as an admin user who is allowed to run sudo commands (per terminal).
+   * Choose a custom name for the second world, e.g. "Second World".
    * Change to the directory of server.sh, and execute:
      * **` sudo ./server.sh -w "Second World" -p 47111 start `**
    * Script result:
@@ -160,8 +160,8 @@ The following instructions assume that the **server script** is already download
      * Prints the stats of the sucessful start for this process
 
 1. **Check the status of a server instance** (e.g. on a headless LAN-Server)
-   * Log in as an admin user who is allowed to run sudo commands (per terminal)
-   * Know the number or name of the world, e.g. 1 or hunger-madness (otherwise the script checks the instance with the latest start/stop time)
+   * Log in as an admin user who is allowed to run sudo commands (per terminal).
+   * Know the number or name of the world, e.g. 1 or hunger-madness (otherwise the script checks the instance with the latest start/stop time).
    * Open a terminal, change to the directory of server.sh, and execute for example one of the following commands: 
      * **` sudo ./server.sh -w1 status `**
      * **` sudo ./server.sh -w hunger-madness status `**
@@ -169,8 +169,8 @@ The following instructions assume that the **server script** is already download
      * Prints the stats for this process
 
 1. **Stop, restart, or backup a server instance** (e.g. on a headless LAN-Server)
-   * Log in as an admin user who is allowed to run sudo commands (per terminal)
-   * Know the number or name of the world, e.g. 2 or second-world (otherwise the script checks the instance with the latest start/stop time)
+   * Log in as an admin user who is allowed to run sudo commands (per terminal).
+   * Know the number or name of the world, e.g. 2 or second-world (otherwise the script checks the instance with the latest start/stop time).
    * Change to the directory of server.sh, and execute for example one of the following commands: 
      * **` sudo ./server.sh -w2 stop `** (or restart, or backup)
      * **` sudo ./server.sh -w second-world stop `** (or restart, or backup)
@@ -178,7 +178,7 @@ The following instructions assume that the **server script** is already download
      * Stops (or restarts, or backs up) the server instance
 
 1. **Update the stable software to the lastest unstable version** (e.g. on a headless LAN-Server)
-   * Log in as an admin user who is allowed to run sudo commands (per terminal)
+   * Log in as an admin user who is allowed to run sudo commands (per terminal).
    * Change to the directory of server.sh, and execute: 
      * **` sudo ./server.sh -U update `**
    * Script result:
@@ -187,7 +187,7 @@ The following instructions assume that the **server script** is already download
      * Restarts all running instances
 
 1. **Rollback the last update** (e.g. on a headless LAN-Server)
-   * Log in as an admin user who is allowed to run sudo commands (per terminal)
+   * Log in as an admin user who is allowed to run sudo commands (per terminal).
    * Change to the directory of server.sh, and execute:
      * **` sudo ./server.sh rollback `**
    * Script result:
@@ -196,8 +196,8 @@ The following instructions assume that the **server script** is already download
      * Restarts all running instances
 
 1. **Downgrade to a specific software version** (e.g. on a headless LAN-Server)
-   * Log in as an admin user who is allowed to run sudo commands (per terminal)
-   * Know the desired verion number and wether it is stable or untable
+   * Log in as an admin user who is allowed to run sudo commands (per terminal).
+   * Know the desired verion number and wether it is stable or untable.
    * Change to the directory of server.sh, and execute for example one of the following commands:
      * **` sudo ./server.sh -U -v 1.5.2.3 reinstall `**
      * **` sudo ./server.sh -S -v 1.5.1.6 reinstall `**
@@ -207,7 +207,7 @@ The following instructions assume that the **server script** is already download
      * Restarts all running instances
 
 1. **Above tasks with local setup described in point 1** (e.g. on a desktop gaming computer)
-   * Assumed you are already logged in as the user who shall run the client and manage the LAN-Server
+   * Assumed you are already logged in as the user who shall run the client and manage the LAN-Server.
    * Open a terminal window, change to the directory of server.sh, and execute:
      * same as above but without sudo: **` ./server.sh ... `**
    * Script result:
@@ -215,13 +215,13 @@ The following instructions assume that the **server script** is already download
 
 1. **Set up a multiple version environment** (e.g. production/test version parallel)
    * Assumed there is already a default stable installation (owner vintagestory and basedir /opt/vintagestory/game) to be kept as production environment.
-   * Log in as an admin user who is allowed to run sudo commands (per terminal)
+   * Log in as an admin user who is allowed to run sudo commands (per terminal).
    * Change to the directory of server.sh, and execute:
      * **` sudo cp -pf /etc/opt/vintagestory /opt/vintagestory/.vintagestory.prod `**
-   * Set up new unstable test environment (existing environment should be stopped for safety)
+   * Set up new unstable test environment (existing environment should be stopped for safety).
      * **` sudo ./server.sh stop `** (use -w parameter to specify instances if more than one)
      * **` sudo ./server.sh -U -b /opt/vintagestory/test setup `**
-   * Link the producion configuration with the corresponding server script
+   * Link the producion configuration with the corresponding server script.
      * **` sudo ln -sf /opt/vintagestory/.vintagestory.prod ./.etc `**
    * Result:
      * Stops the specified instances that are currently running
@@ -231,7 +231,7 @@ The following instructions assume that the **server script** is already download
      * Does not change data directory (but performs a backup of the existing data)
      * Both environments can be maintained (e.g. updated) independently, but you must always ensure to change to the production dir /opt/vintagestory/game when maintaining the production environment, otherwise the test environment would be affected.
    * Hint:
-     * To run the test environment in parallel, you must use a world configuration with a different port (e.g. the second world in the example above)
+     * To run the test environment in parallel, you must use a world configuration with a different port (e.g. the second world in the example above).
 
 ## Roadmap
 
