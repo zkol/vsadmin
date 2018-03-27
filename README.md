@@ -1,6 +1,6 @@
 # VSadmin
 
-This repository contains admin scripts for Vintage Story (take a look at the [homepage](https://www.vintagestory.at) if you want to learn about Vintage Story) to be executed in a terminal or to be integrated in automated tasks of the server host OS. 
+This repository contains admin scripts for Vintage Story (please take a look at the [homepage](https://www.vintagestory.at) if you want to learn more about Vintage Story) to be executed in a terminal or to be integrated in automated tasks of the server host OS. 
 
 ## History
 
