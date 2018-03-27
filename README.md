@@ -4,7 +4,7 @@ This repository contains admin scripts for Vintage Story (see [homepage](https:/
 
 ## History
 
-Tyron created an initial server script to be shipped with Vintage Story (heavily adapted from [minecraft tutorials](http://minecraft.gamepedia.com/Tutorials/Server_startup_script)). His idea was to provide a shell script for setting up a Vintage Story Multiplayer server on a Linux based host via terminal commands, especially mentioned as a quick start for users that are not familiar with creating their own scripts. This server script was not mentioned as a production ready hosting solution and had the following (limited) features:
+Tyron created an initial server script to be shipped with Vintage Story (heavily adapted from [minecraft tutorials](http://minecraft.gamepedia.com/Tutorials/Server_startup_script)). His idea was to provide a shell script for setting up a Vintage Story Multiplayer server on a Linux based host via terminal commands, especially mentioned as a quick start for users that are not familiar with creating their own scripts. This server script was neither designed as a fully production ready hosting solution nor as a fully fledged admin interface, but it had the following (limited) features to manage the most common tasks:
 
 * start, stop, restart the server as daemon (meant to be integrated in the boot process)
 * simple status check of the server daemon
@@ -14,7 +14,7 @@ Tyron created an initial server script to be shipped with Vintage Story (heavily
 
 Having this features in a shell script, it is important to emphasize that this script was never mandatory to run a Vintage Story server (running mono VintagestoryServer.exe is sufficient)
 
-As the Vintage Story evolved, more and more script features were broken by changes in VintagestoryServer.exe and Tyron had no time to fix the usablitity and compatibilty issues that were reported. So he asked me if I could help and fix the script. Working on the development priorities 1-4 (see below), I reached step by step the point, where I felt it necessary to refacore the script in order to manage the switch from Vintage Story versions 1.4.9 to 1.5.1. In consequence, Tyron asked me to set up a git repository to access script code (and documentation).
+As the Vintage Story evolved, more and more script features were broken by changes in VintagestoryServer.exe and Tyron had no time to fix the usablitity and compatibilty issues that were reported. So he asked me if I could help and fix the script. Working on the development priorities 1-4 (see below), I reached step by step the point, where I felt it necessary to refactore the script in order to manage the switch from Vintage Story versions 1.4.9 to 1.5.1. In consequence, Tyron asked me to set up a git repository to access script code (and documentation).
 
 ## Development Focus
 
