@@ -214,17 +214,17 @@ The following instructions assume that the **server script** is already download
      * same as above, too
 
 1. **Set up a multiple version environment** (e.g. production/test version parallel)
-   * Assumed there is already a default stable installation (owner vintagestory and basedir /opt/vintagestory/game) to be kept as production environment)
+   * Assumed there is already a default stable installation (owner vintagestory and basedir /opt/vintagestory/game) to be kept as production environment.
    * Log in as an admin user who is allowed to run sudo commands (per terminal)
    * Change to the directory of server.sh, and execute:
      * **` sudo cp -pf /etc/opt/vintagestory /opt/vintagestory/.vintagestory.prod `**
-   * Set up new unstable test environment (for safety existing environment should be stopped before)
-     * **` sudo ./server.sh stop `** (use -w parameter to specify the running instances if there are more than one)
+   * Set up new unstable test environment (existing environment should be stopped for safety)
+     * **` sudo ./server.sh stop `** (use -w parameter to specify instances if more than one)
      * **` sudo ./server.sh -U -b /opt/vintagestory/test setup `**
-   * Link the producion configuration to the corresponding server script
+   * Link the producion configuration with the corresponding server script
      * **` sudo ln -sf /opt/vintagestory/.vintagestory.prod ./.etc `**
    * Result:
-     * Stops the instances that are currently running
+     * Stops the specified instances that are currently running
      * Saves the production configuration from being overwritten by a test installation
      * Asks for confirmation to set up the test installation with the chosen parameters
      * Downloads and installs latest ustable Vintage Story software under new base directory /opt/vintagestory/test
@@ -238,7 +238,6 @@ The following instructions assume that the **server script** is already download
 This is a list of potential topics for the next script versions.
 
 ### Prio 1 
-1. Test and document how to install multiple server versions in parallel (considerung script/configuration links that reside in different locations)
 1. Split basic start/stop/status features from server.sh (portable according to system V init style, with minimized handling of one datapath relative to the script location) from the extended admin features (move the existing features to a vsadmin.sh script)
 1. Replace screen, instead start the daemon by POSIX shell commands, improve force stop/restart feature (in the case of a not responsive server status)
 1. Replace host existing connect test (by using a openssl command sequence) with wget-based connection test (eliminate openssl dependency)
