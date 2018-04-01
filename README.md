@@ -241,10 +241,8 @@ This is a list of potential topics for the next script versions.
 1. Split basic start/stop/status features from server.sh (portable according to system V init style, with minimized handling of one datapath relative to the script location) from the extended admin features (move the existing features to a vsadmin.sh script)
 1. Replace screen, instead start the daemon by POSIX shell commands, improve force stop/restart feature (in the case of a not responsive server status)
 1. Better documentation of minimal server requirements as well as refinement of requirement checks
-1. Currently the setup task relocates the installation to the desired location be doing simply a full reinstall (including a download). This might confuse a more experienced user who already created and installed everything manually. The setup task should consider that no relocation and reinstall is needed, doing only a reconfiguration according to the passed setup parameters.
 
 ### Prio 2
-1. Reduce the dependency on naming conventions, to provide a better interface to other server management tools (e.g. web GUI written by other community members)
 1. Add options to repair/cleanup/uninstall for old/failed installs (searching the file system for Vintage Story binaries)
 1. Provide option to start/stop all registered parallel instances with one command (including option to list this instances)
 1. Improve trace feature as well as error-code systematics and documentation (trace could be selective by providing a previous error code)
@@ -255,7 +253,7 @@ This is a list of potential topics for the next script versions.
 1. Improve current restart logic in case of SW installation: no quick stop/start, instead scheduling server admin notification (console/server) to recommend restart
 1. Manage full serverconfig.json template when serverconfig.json is missing (or use the JSON merge feature)
 1. Manage to consistently rename worlds/datafiles
-1. Introduce to execute prepared server commandfiles, e.g. for world upgrade by block remapping  
+1. Introduce to execute prepared server commandfiles, e.g. for world upgrade by block remapping
 
 ## How the script works
 

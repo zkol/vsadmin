@@ -1,6 +1,6 @@
 #!/bin/sh
 # /etc/init.d/vintagestory.sh
-# version 1.5.1.5 2018-03-28 (YYYY-MM-DD)
+# version 1.5.1.6 2018-04-01 (YYYY-MM-DD)
 #
 ### BEGIN INIT INFO
 # Provides:   vintagestory
@@ -14,85 +14,7 @@
 # Description:    Starts the vintagestory server
 ### END INIT INFO
 
-# Initially inspired by http://minecraft.gamepedia.com/Tutorials/Server_startup_script
-#
 # Changelog:
-# 2018-01-04 Download path of tar.gz changed
-#            Status command checks for 2 processes with service signature (screen and mono)
-#            Server stop command tries to quit screen as last option
-#            Check for mono-xmltool and compiler version > 4.2
-#            Can be run as user of group vintagestory (not only by vintagestory owner)
-#            Can be run as vintagestory owner by SU even when the default shell permits a login
-# 2018-01-05 Environment-Variable "NO_SUPPORT_MODE" to possibly ignore the version check
-#            Fixed update to consider versions as documented (shall not downgrade newer unstable versions)
-#            Adjusted some operators & co for better script portability and better fault tolerance  (removing deprecated notation)
-#            Mixed coding practises slightly harmonized for better maintainability (less style mixing)
-#            Check if downloaded archive is not HTML file (e.g. 404 page)
-#            Check if downloaded archive is really a gzip file
-#            Switched download to HTTPS
-#            Fixed ownership of reinstalled/updated/archived files
-#            Optional version parameter for reinstall in order to allow a downgrade
-#            Adjusted install function truncating version number from 5 chars to 7 chars
-#            Adjusted command handling (accessing the logged result)
-# 2018-01-06 Using -v instead of monodis (eliminates one dependency and its check)
-#            Adding command probe to the status check (as function vs_status)
-#            Adding proper return values and error messages to the functions
-#            Fixed command output
-#            Adding a general installation check
-#            Adding basic server environment setup
-# 2018-01-13 Workaround to recognize running server process by user of group vintagestory (and vice versa)
-#            Improved installation approach (create new folder) that should work even with major updates
-#            Install new version in parallel to running server and switch/restart afterwards
-#            Fix backup during install to archive the OLD version (and not the NEW version)
-#            Support of changed data path in VintagestoryServer 1.4.9.2 
-#            Improve backup to support a seperate data backup (on a different path)
-#            Improved install to define and pass the data path parameter to VintagestoryServer 1.4.9.2
-#            Define standard data path for server installation as /var/vintagestory/data
-#            Function vs_version to work around implicit datapath creation silently done by VintagestoryServer -v 
-#            Improved return value handling for independent processing steps
-#            Use NO_SUPPORT_MODE as quick workaround to install/test unstable versions
-# 2018-02-22 Script version 1.5.1
-#            Adjusted umask and datapath group rights, default paths according to http://refspecs.linuxfoundation.org/FHS_3.0/fhs/index.html
-#            Functions vs_usage and vs_out with improved formatting (to console and syslog), e.g. for fatal errors like failed install checks
-#            Refactor vs_status as vs_get_status to get unique service instance status independent from user
-#            Streamlined version check, code backup, data backup, setup (eliminating redundant tasks)
-#            Prompt to run ./server.sh setup instead of calling setup function directly
-#            Replaced workarounds (vs_version datapath handling, process identification, unstable versions, NO_SUPPORT_MODE)
-#            Enhanced update and reinstall supporting VS api server and download checksums (using wget keypinning for additional security)
-#            Clean getopts handling, config options (etc/opt/.vintagestory) to eliminate the need of patching hardcoded values in server.sh
-#            Standardized headers, naming, coding conventions (minimizing sideeffects, ...), ported to /bin/sh for better POSIX conformity
-#            Command conflict/status model: Restart will only start if server was previously started, etc.
-#            Naming conventions and housekeeping features for world data, rollback of SW installs, recover of data backups
-# 2018-03-01 Script version 1.5.1.1 (revoked)
-#            Fixed (01): Empty migration list will not offered for a interactive selection
-#            Fixed (02): Server commands wait for indicator log keyword (instead of fixed time): vs_stop, vs_start, vs_backup
-#            Fixed (03): Migrating a folder with multiple worlds preserves the active serverconfig and does not overwrite worlds
-#            Fixed (04): Script recognized legacy world saves in the datapath and imports them without user interaction
-#            Fixed (05): Additional check during start command to prevent starting multiple servers in parallel (on the same port)
-#            Fixed (06): Ownership and group rights of /etc/opt configfile adjusted to root, ownership checked before creating link to configfile
-#            Fixed (07): Setup maintains legacy saves once per new VS_DAT location - client specific DATADIR is always pruned from the legacy search
-#            Fixed (08): Specific world migration condition for backup task and vs_get_world_id match, duplicate check for world selection condition
-#            Fixed (09): Restart and migration after reinstall now recognizes the migrated world properly, error handling of the backup function
-#            Fixed (10): Command substitution of vs_command, vs_get_status, vs_get_world_id, vs_host_connect replaced to fix abort
-#            Fixed (11): Creating world data folder (including minial serverconfig) not without confirmation, especially not on read-only tasks
-#            Fixed (12): Processing of online backup filenames now produces the correct world name input for the recovery function
-#            Reduce (sometimes confusing) console output to a reasonable minimum by using debug loglevel
-# 2018-03-03 Script version 1.5.1.2
-#            Fixed: Setting executable rights properly (now works with /bin/sh too)
-#            Fixed: Prevent 1.5.1.6 crash caused by invalid seeds in serverconfig files by limiting seed to 9 decimal digits
-#            Usability: Import of legacy worlds keeps seed value from server logfile
-#            Usability: Better status handling for recovery, Failed requirement check asks for confirmation
-# 2018-03-23 Script version 1.5.1.3
-#            Fixed: \n output with some shell implementations
-#            Pass -l & -p parameter to set_env function for technical lock handling and technical default port handling
-#            Tweak: Startup conflict handling considers the port number: multiple servers can be started as long as port numbers are different
-#            Tweak: Recognize need of setup even on manual installation in the default path
-#            Tweak: lowered the required screen version and rephrased abort message (that already allows to continue anyway).
-#            Tweak: option to continue even on installation inconsistency (considering messing up by manual installation)
-#            Tweak: more verbose output to the syslog facility
-# 2018-03-26 Script version 1.5.1.4
-#            Fixed: Removed user switch related to exit E#24 (user switch is not needed and in some constellations not possible)
-#            Fixed: \n output with some shell implementations (special printf handling for log output that may contain % characters)
 # 2018-03-28 Script version 1.5.1.5
 #            Fixed: grep might recognize server-main.txt as binary file because of NUL bytes (gives an unexpected output)
 #            Fixed: Remove archived online backup files from Backups folder and exclude Backups folder from full backup (would affect recovery from backup)
@@ -100,7 +22,19 @@
 #            Tweak: Message about resource conflict now includes the port number
 #            Tweak: Host connection test simplified (dependency from openssl eliminated)
 #            Tweak: Keep a (manually) linked configuration file during update/reinstall
-#            
+# 2018-04-01 Script version 1.5.1.6
+#            Fixed: setup of folder group permissions for a non-root user now considers the right folders
+#            Fixed: link to editable configuation file sometimes messed up
+#            Fixed: reinstall of same version triggers a world data migration (which was not necessary) 
+#            Tweak: setup considers existing install to adjust/relocate/update (instead of always doing a full reinstall)
+#            Tweak: restart on version change considers only started worlds for backup/migration (instead of all worlds) 
+#            Tweak: weighted housekeeping threshold parameter (factor 1 for directories, factor 3 for files)
+#            Tweak: added host connection parameters to the editable text configuration (centralizing the static constants) 
+#            Tweak: adjusted timestamp format to long-iso (according to POSIX file date handling with ls)
+#            Tweak: Try to sync installation metadata (on confirmation) before abort
+#            Tweak: Reduced dependency from naming conventions: World folder suffix is now configurable (and can be disabled by -s -)
+#            Refactoring: new functions `vs_idx_base`, `vs_idx_data`, `vs_set_cfg` to prepare script modularization
+#
 
 #######################################
 # Standard output (logger) and exit
@@ -164,7 +98,8 @@ vs_usage() {
   printf " or: ${script} [OPTION]... (start | stop | restart | status | backup | recover)\n"
   printf " or: ${script} [OPTION]... command SERVER_COMMAND\n"
   printf "\nSetup options:\n -o OWNER     Set custom owner name for software setup.\n -b BASEDIR   Set custom full directory path for software installation.\n"
-  printf " -d DATADIR   Set custom full directory path for world data access.\n -C | -R      Consider complete|reduced package for installation.\n"
+  printf " -d DATADIR   Set custom full directory path for world data access.\n -s SUFFIX    Set custom static suffix as naming convention for world data.\n"
+  printf " -C | -R      Consider complete|reduced package for installation.\n"
   printf "\nGeneral options:\n -v VERSION   Set reference versionstring (not latest version).\n -w WORLD     Set custom world subdirectory for data access.\n"
   printf " -U | -S      Consider unstable|stable branch for installation.\n -T           Trace script run in test mode (ignoring some checks).\n"
   printf "\nTechnical options:\n -l PID       Consider the lock that is hold by process id PID\n"
@@ -262,8 +197,11 @@ vs_toolcheck() {
 }
 
 #######################################
-# Get the VS server instance run status
+# Get the current VS server instance run status
+#   Derives the "to be" status from optional metadata (.info)
 # Globals:
+#   VS_CLR : C# runtime environment (interpreter)
+#   VS_BAS : SW install base dir
 #   VS_BIN : VS binary name
 #   VS_DAT : world data root folder
 # Arguments:
@@ -282,16 +220,16 @@ vs_get_status() {
   esac
   [ -z "${1}" ] && vs_out -a "vs_get_status() mandatory parameter missing: server instance (world id)" 3
   world="${1}";  
-  inst="${VS_BIN} --dataPath ${VS_DAT}/${world}"                          # each instance is defined by its own data path
+  inst="${VS_BAS}/${VS_BIN} --dataPath ${VS_DAT}/${world}"                # each instance is defined by its own data path
   run_info=$(cat "${VS_DAT}/${world}/.info"  2>/dev/null)
   target_status="${run_info%:*}"
-  _pid=$(pgrep -fx "mono ${inst}.*")               || [ $? -eq 1 ]        || vs_out -a "Unexpected condition E#10" 3
+  _pid=$(pgrep -fx "${VS_CLR} ${inst}.*")          || [ $? -eq 1 ]        || vs_out -a "Unexpected condition E#10" 3
   if [ -z "${_pid}" ] ; then
     val=1; [ -z "${var}" ]   && vs_out "${inst} (to be ${target_status:-STOPPED}) is not running" ${val} 
   else     # workaround: ensure that service is not about to terminate (server might be waiting for confirmation input after crash)
     vs_command -v _stat_msg "${world}" "stats"     || [ $? -eq 1 ]        || vs_out "Indeterminate ${inst} (to be ${target_status:-STOPPED})" 2 || return $?  
     sleep .5
-    _pid=$(pgrep -fx "mono ${inst}.*")             || [ $? -eq 1 ]        || vs_out -a "Unexpected condition E#11" 3
+    _pid=$(pgrep -fx "${VS_CLR} ${inst}.*")        || [ $? -eq 1 ]        || vs_out -a "Unexpected condition E#11" 3
     if [ -z "${_pid}" ] ; then
       val=1; [ -z "${var}" ] && vs_out "${inst} (to be ${target_status:-STOPPED}) is not running" ${val} 
     elif [ -z "${_stat_msg}" ] ; then
@@ -310,6 +248,8 @@ vs_get_status() {
 # Send VS server instance command
 # Globals:
 #   VS_DAT : world data root folder
+#   VS_CFG : server config file name
+#   VS_OUT : server output file
 # Arguments:
 #   $1 : -v VAR (opt. variable returns output)
 #   $2 : -k KEY (opt. keyword limits output)
@@ -321,7 +261,7 @@ vs_get_status() {
 #   2  : command not sent
 #######################################
 vs_command() {
-  local key='' var='' val='' ret world cmd inst_log time timeout
+  local key='' var='' val='' ret world cmd inst_log time timeout cfg
   case ${1} in
     -k) shift; key=$(printf "${1:-'] Handling'}\n] Unknown\n"); var='tmp'; shift ;;
     -v) shift; var="${1}"; shift                                                 ;;
@@ -330,8 +270,9 @@ vs_command() {
   [ -z "${1}" ] && vs_out -a "vs_command() mandatory parameter missing: server instance (world id)" 3
   world="${1}"; shift       
   cmd="${*}"
-  if [ "${world#w[0-9][0-9]-}" != "${world}" -a -n "${cmd}" ] ; then
-    inst_log="${VS_DAT}/${world}/Logs/server-main.txt"
+  cfg=$(grep -s '"SaveFileLocation":' "${VS_DAT}/${world}/${VS_CFG}" | cut -d: -f2)
+  if [ -f "$(eval echo ${cfg%,})" -a -n "${cmd}" ] ; then             # check if the world refers to properly configured world
+    inst_log="${VS_DAT}/${world}/${VS_OUT}"
     set -- $(wc -l "${inst_log}" 2>/dev/null) 0                       # set pre line count as $1
     if vs_user "screen -p 0 -S ${world} -X eval 'stuff \"/${cmd}\"\015' >/dev/null 2>&1" ; then
       time=0; timeout=450                                             # 450 * 0.1 = 45 sec
@@ -360,8 +301,10 @@ vs_command() {
 
 #######################################
 # Stop VS server instance
+#  Defines a "to be" status in the metadata (.info)
 # Globals:
 #   VS_BIN : VS binary name
+#   VS_BAS : SW install base dir
 #   VS_DAT : world data root folder
 #   VS_PIF : port information file
 #   VS_IPN : instance port number
@@ -375,8 +318,8 @@ vs_command() {
 vs_stop() {
   local world inst run_info target_status status
   [ -z "${1}" ] && vs_out -a "vs_stop() mandatory parameter missing: server instance (world id)" 3
-  world="${1}" ; shift     
-  inst="${VS_BIN} --dataPath ${VS_DAT}/${world}"                                    # each instance is defined by its own data path
+  world="${1}" ; shift
+  inst="${VS_BAS}/${VS_BIN} --dataPath ${VS_DAT}/${world}"                          # each instance is defined by its own data path
   run_info=$(cat "${VS_DAT}/${world}/.info" 2>/dev/null)
   target_status="${1:-STOPPED:${run_info#*:}}" 
   vs_get_status -v status "${world}"
@@ -401,14 +344,17 @@ vs_stop() {
         rm -f "${VS_PIF}.${VS_IPN}"                                                 || vs_out -a "Unexpected condition E#13c" 3
         ;;
   esac
+  vs_idx_data "${VS_DAT}/${world}"                                                  # update metadata
   return $?
 }
 
 #######################################
 # Start VS server instance
+#  Defines a "to be" status in the metadata (.info)
 # Globals:
-#   VS_BIN : VS binary name
+#   VS_CLR : C# runtime environment (interpreter)
 #   VS_BAS : SW install base dir
+#   VS_BIN : VS binary name
 #   VS_DAT : world data root folder
 #   VS_PIF : port information file
 #   VS_IPN : instance port number
@@ -426,10 +372,10 @@ vs_stop() {
 vs_start() {
   local world other inst run_info target_status status
   [ -z "${1}" ] && vs_out -a "vs_start() mandatory parameter missing: server instance (world id)" 3
-  world="${1}" ; shift  
+  world="${1}" ; shift 
   other=$(cat "${VS_PIF}.${VS_IPN}" 2>/dev/null)
   [ -n "${other}" -a "${other}" != "${world}" ] && vs_out -a "Other world ${other} previously allocated port ${VS_IPN}. Check and try again (maybe stop ${other} or reboot)" 2
-  inst="${VS_BIN} --dataPath ${VS_DAT}/${world}"                                               # each instance is defined by its own data path
+  inst="${VS_BAS}/${VS_BIN} --dataPath ${VS_DAT}/${world}"                                     # each instance is defined by its own data path
   run_info=$(cat "${VS_DAT}/${world}/.info" 2>/dev/null)
   target_status="STARTED:${_VER}" 
   vs_get_status -v status "${world}"
@@ -444,7 +390,7 @@ vs_start() {
         vs_user "cp -f '${VS_BAS}/.tag' '${VS_RTR}'"                                           # allow to track needed restarts caused by SW updates, tag will not be deleted by reboot
         vs_user "printf '${target_status}' >'${VS_DAT}/${world}/.info'   2>/dev/null"          || vs_out -a "Unexpected condition E#14b" 3
         vs_user "printf '${world}' >'${VS_PIF}.${VS_IPN}'                2>/dev/null"          || vs_out -a "Unexpected condition E#14c" 3
-        vs_user "cd '${VS_BAS}' && screen -h 1024 -dmS ${world} mono ${inst} ${OPTIONS}"       || vs_out -a "Unexpected condition E#14" 3
+        vs_user "screen -h 1024 -dmS ${world} ${VS_CLR} ${inst} ${OPTIONS}"                    || vs_out -a "Unexpected condition E#14" 3
         sleep 3                                                                                # allow server to initialize the logfiles and the directories in case of an initial startup
         vs_command -k '] Seed' "${world}" 'seed'
         if ! vs_get_status -v status "${world}"; then
@@ -457,6 +403,7 @@ vs_start() {
         ;;
     2)  vs_out "${inst} (to be ${target_status%:*}) is already running but not responding. Check an try again" 1 ;;
   esac
+  vs_idx_data "${VS_DAT}/${world}"                                                             # update metadata
   return $?
 }
 
@@ -472,10 +419,9 @@ vs_start() {
 #   1  : need backup folder setup
 #######################################
 vs_recover() {
-  local reply=''
+  local reply='' world="${1}" bak io in
   [ -z "${1}" ] && vs_out -a "vs_recover() mandatory parameter missing: server instance (world id)" 3
-  local world="${1}"
-  local bak=$(ls -tdx ${VS_DAT}/backup/vs_${world}_*_v${VS_VER}*.tar.gz 2>/dev/null | head -n1)
+  bak=$(ls -tdx ${VS_DAT}/backup/vs_${world}_*_v${VS_VER}*.tar.gz 2>/dev/null | head -n1)
   if [ -f "${bak}" ] ; then
     echo; read -p "CONFIRMATION REQUIRED: Recover world ${world} from ${bak} (Y/n) " -r reply
     [ "${reply}" = 'n' -o "${reply}" = 'N' ] && return 0 || echo 
@@ -483,8 +429,8 @@ vs_recover() {
     rm -fr /tmp/vs-recover.*  
     vs_user "mkdir -m 775 -p /tmp/vs-recover.$$                     2>/dev/null"  || vs_out -a "Unexpected condition E#19" 3
     vs_user "tar xzf ${bak} -C /tmp/vs-recover.$$                   2>/dev/null"  || vs_out -a "Unexpected condition E#20" 3
-    local io=$(cat "/tmp/vs-recover.$$/.info"                       2>/dev/null)
-    local in=$(cat "${VS_DAT}/${world}/.info"                       2>/dev/null)
+    io=$(cat "/tmp/vs-recover.$$/.info"                             2>/dev/null)
+    in=$(cat "${VS_DAT}/${world}/.info"                             2>/dev/null)
     vs_user "printf '${in%:*}:${io#*:}' >'/tmp/vs-recover.$$/.info' 2>/dev/null"  || vs_out -a "Unexpected condition E#25" 3
     touch -cr "${VS_DAT}/${world}/.info" "/tmp/vs-recover.$$/.info" 2>/dev/null   # keep the timestamp of previous version if available
     vs_migrate "/tmp/vs-recover.$$" '*.vcdbs' "${world}"
@@ -498,8 +444,10 @@ vs_recover() {
 #######################################
 # Backup VS working directory
 # Globals:
-#   VS_NUM : threshold (count) to keep backups
+#   VS_HIS : threshold (count) to keep backups
 #   VS_DAT : world data root folder
+#   VS_CFG : server config file name
+#   VS_MIG : world data migration list
 #   VS_UI1 : setup usage info
 #   _VER   : actual version (install)
 # Arguments:
@@ -511,21 +459,22 @@ vs_recover() {
 #   2  : need backup folder setup
 #######################################
 vs_backup() {
-  local flag wd wn ri bk bn fl fn
+  local flag wd wn ri bk bn fl fn num
   case ${1} in
     -m) shift; flag='-m'                  ;;
     --) shift                             ;;
   esac
+  num=$((${VS_HIS}*3))                                                                                            # 3 times the threshold for file based housekeeping use (compared to directory based)
   wd="${1}"; vs_get_world_id -v wn "${wd##*/}"
   ri=$(cat "${VS_DAT}/${wn}/.info" 2>/dev/null); ri="${ri#*:}"
-  bk="$(date +%F_%T)_v${ri:--legacy}"; bn="${bk}_${wn}.vcdbs"
-  fl="Backups/${bn} serverconfig.json servermagicnumbers.json .info Playerdata"
+  bk="$(date +%F_%H:%M)_v${ri:--legacy}"; bn="${bk}_${wn}.vcdbs"
+  fl="Backups/${bn} ${VS_CFG} ${VS_MIG}"
   fn="${VS_DAT}/backup/vs_${wn}_${bk}"
   if [ -d "${VS_DAT}/backup" ] ; then
     if [ "${flag}" != '-m' ] && vs_get_status -v flag "${wn}" ; then
       vs_out "Start online world backup of ${wd} ..." -1
-      ls -tdx ${wd}/Backups/*_${wn}.vcdbs 2>/dev/null          | sed -e "1,${VS_NUM}d" | xargs rm -f              || vs_out "Housekeeping of online backup databases failed" 2
-      ls -tdx ${VS_DAT}/backup/vs_${wn}_*_o.tar.gz 2>/dev/null | sed -e "1,${VS_NUM}d" | xargs rm -f              || vs_out "Housekeeping of online backup archives failed" 2
+      ls -tdx ${wd}/Backups/*_${wn}.vcdbs 2>/dev/null          | sed -e "1,${num}d" | xargs rm -f                 || vs_out "Housekeeping of online backup databases failed" 2
+      ls -tdx ${VS_DAT}/backup/vs_${wn}_*_o.tar.gz 2>/dev/null | sed -e "1,${num}d" | xargs rm -f                 || vs_out "Housekeeping of online backup archives failed" 2
       vs_command -k '] Backup' "${wn}" "genbackup ${bn}" && vs_user "chmod -f g+w ${wd}/Backups/${bn}"
       [ -f "${wd}/Backups/${bn}" ]                                                                                || vs_out -a "Online backup not available" 3
       vs_user "tar czf '${fn}_o.tar.gz' --transform 's+Backups/${bk}_+Saves/+g' -C ${wd} ${fl}"                   || vs_out -a "Online backup failed" 3
@@ -533,7 +482,7 @@ vs_backup() {
       vs_out "Created backup ${fn}_o.tar.gz (online)" 0
     else
       vs_out "Start full data backup of ${wd} ..." -1
-      ls -tdx ${VS_DAT}/backup/vs_${wn}_*_f.tar.gz 2>/dev/null | sed -e "1,${VS_NUM}d" | xargs rm -f              || vs_out "Housekeeping of old full backup archives failed" 2
+      ls -tdx ${VS_DAT}/backup/vs_${wn}_*_f.tar.gz 2>/dev/null | sed -e "1,${num}d" | xargs rm -f                 || vs_out "Housekeeping of old full backup archives failed" 2
       vs_user "tar czf '${fn}_f.tar.gz' -C ${wd} . --exclude=backup --exclude=Backups"                            || vs_out -a "Full backup failed" 3
       vs_out "Created backup ${fn}_f.tar.gz (full)" 0
       [ "${wd%/*}" = "${VS_DAT}" -a -d "${VS_DAT}/${wn}" -a "${ri#*:}" != "${_VER}" ]                             && vs_migrate "${VS_DAT}/${wn}" '*.vcdbs' "${wn}"
@@ -546,7 +495,10 @@ vs_backup() {
 #######################################
 # Get VS host connectstring if available 
 # Globals:
-#   none
+#   SR_HOST: release api hostname:port 
+#   SR_PKEY: release api pubkey sha256 digest
+#   SP_HOST: package repo hostname:port 
+#   SP_PKEY: package repo pubkey sha256 digest
 # Arguments:
 #   $1 : -v VAR (opt. variable returns connectstring)
 #   S2 : package | release
@@ -560,14 +512,12 @@ vs_host_connect() {
     --) shift                  ;;
   esac
   case "${1}" in
-    package) sha='l59rOf/3g9fX7Nxyhg457pQkFONpCN7R/ovScanZ0+g='
-             host='account.vintagestory.at'; port='443';;
-    release) sha='l59rOf/3g9fX7Nxyhg457pQkFONpCN7R/ovScanZ0+g='
-             host='api.vintagestory.at'; port='443';;
+    package) sha="${SP_PKEY%=}="; host=${SP_HOST%:*}; port=${SP_HOST#${host}}; port=${port#:} ;;
+    release) sha="${SR_PKEY%=}="; host=${SR_HOST%:*}; port=${SR_HOST#${host}}; port=${port#:} ;;
     *)       vs_out -a "Function vs_host_connect: Invalid call with parameter '${1}' (E#16)" 3 ;; 
   esac
-  val="--pinnedpubkey=sha256//${sha} --https-only https://${host}:${port}"
-  err=$(wget -q --spider ${val} 2>&1); ret=$?
+  val="--pinnedpubkey=sha256//${sha} --https-only https://${host}:${port:-443}"
+  err=$(wget -q --spider ${val}/robots.txt 2>&1); ret=$?
   if [ ${ret} -eq 0 -o ${ret} -eq 8 ]; then 
     [ -n "${var}" ] && eval "${var}='${val}'" || echo "${val}"
   else
@@ -599,9 +549,123 @@ vs_fix_inst() {
 }
 
 #######################################
+# Collect version metadata (write .tag)
+# Globals:
+#   VS_CLR : C# runtime environment (interpreter)
+#   VS_BIN : VS binary name
+#   VS_DTL : VS desktop launcher
+# Arguments:
+#   $1 : SW install base dir
+# Returns:
+#   0  : always OK (otherwise abort)
+#######################################
+vs_idx_base() {
+  local con slist bf bd bv bb nt
+  vs_host_connect -v con 'release'
+  slist="$(wget ${con}/stable.json -q -O -)"
+  for bf in $(ls -tdx ${1}/${VS_BIN} 2>/dev/null) ; do
+    bd="${bf%/*}"
+    nt=$(ls -tdl "${bf}" | cut -d ' ' -f 6,7 | tr '[:space:]' '_'); nt=${nt%_} # like "date +%F_%H:%M" if TIME_TYPE=long-iso works, otherwise like "date +%b_%d"
+    bv=$(${VS_CLR} ${bf} -v | tr -dc '[:print:]')
+    bb=$(echo "${slist}" | grep -c "${bv}"); 
+    [ "${bb}" -gt 0 ]        && bb='stable'     || bb='unstable'   
+    [ -f "${bd}/${VS_DTL}" ] && ba='vs_archive' || ba='vs_server'
+    vs_out "$(printf 'VS_IDX basedir="%s" branch="%s" type="%s" version="%s" time="%s"' "${bd}" "${bb}" "${ba}" "${bv}" "${nt}")" -1
+    vs_user "echo ${bb} ${ba}_${bv} ${nt} > ${bd}/.tag" || vs_abort "Metadata creation failed. Please repair environment by running '${VS_UI2}' with proper privileges" 1
+  done
+  return 0
+}
+
+#######################################
+# Collect instance metadata (write .info)
+# Globals:
+#   VS_BIN : VS binary name
+#   VS_CFG : server config file name
+#   VS_OUT : server output file
+# Arguments:
+#   $1 : world data folder (opt. with wildcard)
+# Returns:
+#   0  : always OK (otherwise abort)
+#######################################
+vs_idx_data() {
+  local form wi wd wn sf cp cs mi lv ls lp lr
+  for wd in $(ls -tdx ${1} 2>/dev/null) ; do
+    wi="${wd}/${VS_CFG}"
+    mi="${wd}/.info"
+    if [ -f "${wi}" ] ; then
+      sf=$(grep -s '"SaveFileLocation":' "${wi}" | cut -d: -f2); sf=$(eval echo ${sf%,})
+      wn=$(grep -s '"WorldName":'        "${wi}" | cut -d: -f2); wn=$(eval echo ${wn%,})
+      cs=$(grep -s '"Seed":'             "${wi}" | cut -d: -f2); cs=$(eval echo ${cs%,})
+      cp=$(grep -s '"Port":'             "${wi}" | cut -d: -f2); cp=$(eval echo ${cp%,})
+      if [ -f "${sf}" ] ; then
+        ls=$(cat "${wd}/${VS_OUT}" 2>/dev/null | tr -d '\000' | grep '] Seed: '                ); ls=${ls#*] Seed: }
+        lp=$(cat "${wd}/${VS_OUT}" 2>/dev/null | tr -d '\000' | grep 'Server running on Port ' ); lp=${lp#*Server running on Port }
+        lv=$(cat "${wd}/${VS_OUT}" 2>/dev/null | tr -d '\000' | grep '] Server v'              ); lv=${lv#*] Server v}
+        lr=$(cat "${wd}/${VS_OUT}" 2>/dev/null | tr -d '\000' | grep '] Stopped the server'    ); lr=${lr:+STOPPED}
+        if pgrep -cf "${VS_BIN} --dataPath ${wd}" >/dev/null ; then
+          [ -n "${lr}" ] && vs_out "VS server ${wd} found STARTED (logged as stopped in ${VS_OUT} - maybe stop has failed)"
+          lr='STARTED'
+        elif [ -z "${lr}" -a -n "${ls}" ] ; then
+          vs_out "VS server ${wd} not found STARTED (logged as started in ${VS_OUT} - maybe crashed)"
+          lr='STARTED'
+        else
+          lr='STOPPED'
+        fi
+        if [ -n "${ls}" -a -n "${cs}" -a "${cs}" != "${ls}" ] ; then
+          vs_out "Syncing configuration ${wi} with seed ${ls} (as previously logged in ${VS_OUT})"
+          vs_set_cfg "${wd}" -sn "${ls}"
+        fi
+        if [ -n "${lp%%!*}" -a -n "${cp}" -a "${cp}" != "${lp%%!*}" ] ; then
+          vs_out "Configuration ${wi} has port ${cp} (differs from port ${lp%%!*} previously logged in ${VS_OUT})"
+        fi
+        form='VS IDX datadir="%s" subdir="%s" worldsave="%s"\nJSON seed="%s" port="%s" worldname="%s"\nLOG  seed="%s" port="%s" version="%s" stop="%s"' 
+        vs_out "$(printf "${form}" "${wd%/*}" "${wd##*/}" "${sf##*/}" "${cs}" "${cp}" "${wn}" "${ls}" "${lp%%!*}" "${lv%%,*}" "${lr}")" -1
+        vs_user "echo ${lr}:${lv%%,*} > ${wd}/.info" || vs_out "Metadata creation in ${wd} failed." 2
+        touch -cr "${sf}" "${wd}" 2>/dev/null   # set timestamp of last world usage
+        touch -cr "${sf}" "${wi}" 2>/dev/null   # set timestamp of last world usage
+        touch -cr "${sf}" "${mi}" 2>/dev/null   # set timestamp of last world usage
+      fi
+    fi
+  done
+}
+
+#######################################
+# Set parameters in server config 
+# Globals:
+#   VS_CFG : server config file name
+# Arguments:
+#   $1   : world data subdir (server config location)
+#   $2-5 : -sf SAVEFILE   (opt. parameter)
+#   $2-5 : -wn WORLDNAME  (opt. parameter)
+#   $2-5 : -sn SEEDNUMBER (opt. parameter)
+#   $2-5 : -pn PORTNUMBER (opt. parameter)
+# Returns:
+#   0  : always OK (otherwise abort)
+#######################################
+vs_set_cfg() {
+  local cfg="${1}/${VS_CFG}" sf wn sn pn
+  while [ $# -gt 1 ] ; do
+    case ${2} in
+      -sf) shift; sf="${2}"; shift ;;
+      -wn) shift; wn="${2}"; shift ;;
+      -sn) shift; sn="${2}"; shift ;;
+      -pn) shift; pn="${2}"; shift ;;
+      *)   vs_out "Wrong parameter '${2}'" 1; shift ;;
+    esac
+  done
+  if [ -f "${cfg}" ] ; then      # no issue if not writable
+    [ -n "${sf}" ] && vs_user "sed -i 's/\"[^\"]*.vcdbs\"/\"${sf}\"/'                     '${cfg}'  2>/dev/null" 
+    [ -n "${wn}" ] && vs_user "sed -i 's/\"WorldName\":[^,]*,/\"WorldName\": \"${wn}\",/' '${cfg}'  2>/dev/null"
+    [ -n "${sn}" ] && vs_user "sed -i 's/\"Seed\":[^,]*,/\"Seed\": \"${sn}\",/'           '${cfg}'  2>/dev/null"
+    [ -n "${pn}" ] && vs_user "sed -i 's/\"Port\":[^,]*,/\"Port\": \"${pn}\",/'           '${cfg}'  2>/dev/null"
+  fi
+  return 0
+}
+
+#######################################
 # Load, verify, install VS archive
 # Globals:
-#   VS_NUM : threshold (count) to keep backups
+#   VS_HIS : threshold (count) to keep backups
 # Arguments:
 #   $1 : stable | unstable (branch)
 #   $2 : archive name
@@ -611,7 +675,7 @@ vs_fix_inst() {
 #   2  : archive corrupted
 #######################################
 vs_tar_install() {
-  local branch="${1}" archive="${2}" target="${3}" nstamp="$(date +%F_%T)" ostamp="${_DTS}" connect
+  local branch="${1}" archive="${2}" target="${3}" ostamp="$(date +%F_%H:%M)" connect                                             
   vs_out "Try downloading files/${branch}/${archive}.tar.gz"
   [ "${branch}" = 'pre' -o "${branch}" = 'unstable' ]                                                                          && vs_out "Be aware that branch '${branch}' is not intended for productive use" 1
   vs_host_connect -v connect 'package'                                                                                         # otherwise abort
@@ -624,15 +688,17 @@ vs_tar_install() {
   if [ "${branch}" = 'pre' -a -z "${1}" ] || [ "${1}" = "${2}" ] ; then
     rm -fr ${target}.new.* 
     vs_user "mkdir -m 775 -p ${target}.new.$$      2>/dev/null"                                                                || vs_out -a "Unexpected condition E#19" 3
-    vs_user "echo ${branch} ${archive} ${nstamp} > ${target}.new.$$/.tag; tar -xzf /tmp/${archive}.tar.gz -C ${target}.new.$$" || vs_out -a "Unexpected condition E#20" 3
+    vs_user "tar -xzf /tmp/${archive}.tar.gz -C ${target}.new.$$"                                                              || vs_out -a "Unexpected condition E#20" 3
     mv -f ${target}.new.$$/vintagestory/* "${target}.new.$$" 2>/dev/null && rm -fr ${target}.new.$$/vintagestory               # try might fail
     vs_user "cd ${target}.new.$$; chmod -fR -x+X .; chmod -f ug+x *.exe *.sh"
     rm -rf "/tmp/${archive}.tar.gz" "/tmp/${archive}.tar.gz.corrupt"
+    vs_idx_base "${target}.new.$$"                                                                                             # parse installation and create installation tag
     vs_fix_inst "${target}.new.$$"
     if [ -d "${target}" ] ; then
-      ls -tdx ${target}.bak_* 2>/dev/null | sed -e "1,${VS_NUM}d" | xargs rm -fr                                               || vs_out "Housekeeping of old SW backups failed" 2
+      ls -tdx ${target}.bak_* 2>/dev/null | sed -e "1,${VS_HIS}d" | xargs rm -fr                                               || vs_out "Housekeeping of old SW backups failed" 2
       [ -L "${target}/.etc" ] && vs_user "cp -Pf ${target}/.etc ${target}.new.$$/.etc"
       [ -f "${target}/.tag" ] && vs_user "cp -Pf ${target}/.tag ${target}.new.$$/.old"
+      vs_user "echo '${ostamp}' >> ${target}.new.$$/.old"
       mv -fT "${target}" "${target}.bak_${ostamp}"
     fi 
     mv -fT "${target}.new.$$" "${target}"                                                                                      || vs_out -a "Unexpected condition E#21" 3
@@ -650,7 +716,6 @@ vs_tar_install() {
 # Globals:
 #   VS_BAS : SW install base dir
 #   _VER   : actual version (install)
-#   _DTS   : actual install timestamp
 # Arguments:
 #   none
 # Returns:
@@ -658,16 +723,16 @@ vs_tar_install() {
 #   1  : rollback not possible
 #######################################
 vs_rollback() {
-  local target="${VS_BAS}" reply=''
-  set -- $(cat "${target}/.old" 2>/dev/null); local ostamp="${3:-*}"                                                           # read rollback parameters from .old file 
-  local bak=$(ls -tdx ${target}.bak_${ostamp} 2>/dev/null | head -n1)
+  local target="${VS_BAS}" reply='' nstamp="$(date +%F_%H:%M)" ostamp bak
+  set -- $(cat "${target}/.old" 2>/dev/null); ostamp="${4:-*}"                                                                 # read rollback parameters from .old file 
+  bak=$(ls -tdx ${target}.bak_${ostamp} 2>/dev/null | head -n1)
   if [ -d "${bak}" ] ; then 
     echo; read -p "CONFIRMATION REQUIRED: Rollback Vintage Story v${_VER} to previous ${1:-version} ${2} (Y/n) " -r reply
     [ "${reply}" = 'n' -o "${reply}" = 'N' ] && return 0 || echo 
     vs_out "Trying to rollback Vintage Story from current v${_VER} to previous ${1:-version} ${2} ..." -1 
-    [ -d "${target}" ] && mv -fT "${target}" "${target}.rollbak_${_DTS}"
+    [ -d "${target}" ] && mv -fT "${target}" "${target}.rollbak_${nstamp}"
     mv -fT "${bak}" "${target}"                                                                                                || vs_out -a "Unexpected condition E#21" 3
-    rm -fr "${target}.rollbak_${_DTS}" 
+    rm -fr "${target}.rollbak_${nstamp}" 
     vs_set_env '' "${1}" "${2}"                                                                                                # abort with error if version mismatch
     vs_out "Finished rollback to v${_VER}" 0
   else
@@ -696,9 +761,9 @@ vs_update() {
   local branch="${1:-${VS_TAG}}" reply='' newversion="${VS_VER}" connect stable archive
   if [ "${newversion}" = "${_VER}" ] ; then
     vs_host_connect -v connect 'release'                        # otherwise abort
-    newversion="$(wget ${connect}/latest${branch}.txt -q -O -)" || vs_out -a "Cannot get regular version info for branch '${branch}'" 3
+    newversion="$(wget ${connect}/latest${branch}.txt -q -O -)" || vs_out -a "Cannot get 'latest${branch}.txt' for version info" 3
     if [ "${branch}" != 'stable' ] ; then
-      stable="$(wget ${connect}/lateststable.txt -q -O -)"      || vs_out -a "Unexpected condition E#22" 3
+      stable="$(wget ${connect}/lateststable.txt -q -O -)"      || vs_out -a "Cannot get 'lateststable.txt' for comparison' (E#22)" 3
       if vs_higher -q ${newversion} ${stable} ; then
         branch='stable'
         newversion="${stable}"
@@ -754,36 +819,39 @@ vs_reinstall() {
 #######################################
 # Initial setup of VS environment
 # Globals:
-#   VS_NUM : threshold (count) to keep backups
+#   VS_HIS : threshold (count) to keep backups
 #   VS_OLD : threshold (days) to maintain world saves
 #   VS_DPN : default port number
+#   VS_PRE : world data naming prefix
 #   VS_TAG : target branch stable | unstable
 #   VS_TYP : target type vs_server | vs_archive
 #   VS_OWN : owner of world data (server process)
 #   VS_BAS : SW install base dir
 #   VS_DAT : world data root folder
 #   VS_LOG : logging root folder
+#   VS_DTL : VS desktop launcher
 #   VS_UI1 : setup usage info
 # Arguments:
 #   $1 :  target type vs_server | vs_archive
 #   $2 :  owner of world data (server process)
 #   $3 :  SW install base dir
 #   $4 :  world data root folder
+#   $5 :  world data naming prefix
 # Returns:
 #   0  : OK
 #   1  : canceled
 # Redefines:
-#   VS_CFG : configuration file
+#   VS_ETC : editable text configuration file
 #######################################
 vs_setup() {
-  local reply=''
-  VS_TYP=${1:-${VS_TYP}}; VS_OWN=${2:-${VS_OWN}}; VS_BAS=${3:-${VS_BAS}}; VS_DAT=${4:-${VS_DAT}}
-  vs_read_env "${VS_CFG}" HISTDIR DATADIR MENUDIR
+  local reply='' path_list md local_bin
+  VS_TYP=${1:-${VS_TYP}}; VS_OWN=${2:-${VS_OWN}}; VS_BAS=${3:-${VS_BAS}}; VS_DAT=${4:-${VS_DAT}}; VS_PRE=${5:-${VS_PRE}}
+  vs_read_env "${VS_ETC}" HISTDIR DATADIR MENUDIR
   vs_out "CAUTION: Please ensure that no Vintage Story is running on this machine before setup confirmation." 1
   echo; read -p "CONFIRMATION REQUIRED: Basic setup: package='${VS_TYP}' branch='${VS_TAG}' version='${VS_VER}' owner='${VS_OWN}' basedir='${VS_BAS}' datadir='${VS_DAT}' (y/N) " -r reply
   echo
   if [ "${reply}" = 'y' -o "${reply}" = 'Y' ] ; then
-    local path_list="${VS_BAS%/*} ${VS_DAT} ${VS_DAT}/backup ${VS_LOG}"
+    path_list="${VS_BAS%/*} ${VS_DAT} ${VS_DAT}/backup ${VS_LOG}"
     if [ "$(id -un)" != "${VS_OWN}" ] ; then
       if ! getent passwd "${VS_OWN}"    >/dev/null ; then
         useradd -r -s "/bin/false" -U "${VS_OWN}"    >/dev/null 2>&1 || vs_out -a "Setup of user '${VS_OWN}' failed" 3
@@ -794,15 +862,15 @@ vs_setup() {
         vs_out "Setup new group: $(getent group "${VS_OWN}")"
       fi
       [ -d '/etc/opt' ] && { chown root:root '/etc/opt'; chmod -fR g-w '/etc/opt'; } || mkdir -m 755 -p '/etc/opt'
-      local dir; for dir in ${path_list} ; do
-        if [ -d "${dir}" ] ; then
-          chmod -fR g+w "${dir}"                     2>/dev/null     || vs_out -a "Path ${dir} privileges adjustment failed" 3
-          chown -fR ${VS_OWN}:${VS_OWN} "${dir}"     2>/dev/null     || vs_out -a "Path '${dir}' ownership adjustment failed" 3
-          vs_out "Adjusted path: $(ls -ld ${dir})" -1
+      for md in ${path_list} ; do
+        if [ -d "${md}" ] ; then
+          chmod -fR g+w "${md}"                     2>/dev/null      || vs_out -a "Path ${md} privileges adjustment failed" 3
+          chown -fR ${VS_OWN}:${VS_OWN} "${md}"     2>/dev/null      || vs_out -a "Path '${md}' ownership adjustment failed" 3
+          vs_out "Adjusted path: $(ls -ld ${md})" -1
         else
-          mkdir -m 775 -p "${dir}"                   2>/dev/null     || vs_out -a "Path ${dir} creation failed" 3
-          chown "${VS_OWN}:${VS_OWN}" -fR "${dir}"   2>/dev/null     || vs_out -a "Path '${dir}' privileges setup failed" 3
-          vs_out "Setup new path: $(ls -ld ${dir})"
+          mkdir -m 775 -p "${md}"                   2>/dev/null      || vs_out -a "Path ${md} creation failed" 3
+          chown "${VS_OWN}:${VS_OWN}" -fR "${md}"   2>/dev/null      || vs_out -a "Path '${md}' privileges setup failed" 3
+          vs_out "Setup new path: $(ls -ld ${md})"
         fi
       done
     else
@@ -811,32 +879,50 @@ vs_setup() {
       elif ! id -nG | grep "${VS_OWN}" >/dev/null 2>&1 ; then
         vs_out -a "User '${VS_OWN}' cannot use existing group '${VS_OWN}'" 3
       fi
-      for dir in ${path_list} ; do
-        if ! [ -d "${dir}" ] ; then
-          mkdir -m 775 -p "${dir}"                   2>/dev/null     || vs_out -a "Path ${dir} creation failed (try su)" 3
-          chgrp "${VS_OWN}" -fR "${VS_BAS}"          2>/dev/null     || vs_out -a "Path '${dir}' group setup failed (try su)" 3           # attention: avoid links belonging to root!
-          vs_out "Setup new path: $(ls -ld ${dir})"
+      for md in ${path_list} ; do
+        if ! [ -d "${md}" ] ; then
+          mkdir -m 775 -p "${md}"                   2>/dev/null      || vs_out -a "Path ${md} creation failed (try su)" 3
+          chgrp "${VS_OWN}" -fR "${md}"             2>/dev/null      || vs_out -a "Path '${md}' group setup failed (try su)" 3           # attention: avoid links belonging to root!
+          vs_out "Setup new path: $(ls -ld ${md})"
         else
-          chmod -fR g+w "${dir}"                     2>/dev/null     || vs_out -a "Path ${dir} privileges adjustment failed (try su)" 3
-          chgrp "${VS_OWN}" -fR "${VS_BAS}"          2>/dev/null     || vs_out -a "Path '${dir}' group setup failed (try su)" 3           # attention: avoid links belonging to root!
-          vs_out "Adjusted path: $(ls -ld ${dir})" -1
+          chmod -fR g+w "${md}"                     2>/dev/null      || vs_out -a "Path ${md} privileges adjustment failed (try su)" 3
+          chgrp "${VS_OWN}" -fR "${md}"             2>/dev/null      || vs_out -a "Path '${md}' group setup failed (try su)" 3           # attention: avoid links belonging to root!
+          vs_out "Adjusted path: $(ls -ld ${md})" -1
         fi
       done
-      VS_CFG="/home/${VS_OWN}/.vintagestory"                         # cfg is defined by setup and link is placed to persist this definition
+      VS_ETC="/home/${VS_OWN}/.vintagestory"                         # VS_ETC is defined by setup and link is placed to persist this definition
     fi
-    vs_write_env VS_NUM VS_OLD VS_DPN VS_TAG VS_TYP VS_OWN VS_BAS VS_DAT VS_LOG OPTIONS HISTDIR DATADIR
+    vs_write_env VS_HIS VS_OLD VS_DPN VS_PRE VS_TAG VS_TYP VS_OWN VS_BAS VS_DAT VS_LOG OPTIONS HISTDIR DATADIR SR_HOST SR_PKEY SP_HOST SP_PKEY
     [ -e "${VS_BAS%/*}/data" ] || vs_user "ln -sf '${VS_DAT}' '${VS_BAS%/*}/data'"
     [ -e "${VS_BAS%/*}/log" ]  || vs_user "ln -sf '${VS_LOG}' '${VS_BAS%/*}/log'"
     [ -e "${VS_DAT}/log" ]     || vs_user "ln -sf '${VS_LOG}' '${VS_DAT}/log'"
     vs_out "Basic environment setup finished" 0
-    vs_reinstall && vs_restart -c  && vs_maintain_legacy ${VS_OLD}
-    if [ -f "${VS_BAS}/Vintagestory.desktop" -a -d "${MENUDIR}" -a -z "${VS_MIN}" ] ; then
-      vs_read_env "${VS_CFG}" FONTDIR DESKDIR
-      vs_write_env VS_NUM VS_OLD VS_DPN VS_TAG VS_TYP VS_OWN VS_BAS VS_DAT VS_LOG OPTIONS HISTDIR DATADIR MENUDIR FONTDIR DESKDIR
-      vs_out "Recreate desktop entries"     
+    vs_idx_data "${VS_DAT}/*"
+    local_bin="$(readlink -f -- "${0%/*}/${VS_BIN}")"
+    setup_bin="$(readlink -f -- "${VS_BAS}/${VS_BIN}")"
+    if [ -f "${local_bin}" -a "${local_bin}" = "${setup_bin}" ] ; then
+        vs_adjust_workdir "${VS_BAS}"
+    elif [ -f "${local_bin}" -a ! -f "${setup_bin}" ] ; then
+      echo; read -p "CONFIRMATION REQUIRED: Do you want to move directory ${local_bin%/*} to ${VS_BAS} instead of a complete reinstall (y/N) " -r reply; echo
+      if [ "${reply}" != 'n' -a "${reply}" != 'N' ] ; then
+        mv -f "${local_bin%/*}" "${VS_BAS}"
+        vs_adjust_workdir "${VS_BAS}"
+      else
+        vs_reinstall
+      fi
+    elif [ -f "${setup_bin}" ] ; then
+      vs_update
+    else
+      vs_reinstall
+    fi
+    vs_restart -c  && vs_maintain_legacy ${VS_OLD}
+    if [ -f "${VS_BAS}/${VS_DTL}" -a -d "${MENUDIR}" -a -z "${VS_MIN}" ] ; then
+      vs_read_env "${VS_ETC}" FONTDIR DESKDIR
+      vs_write_env VS_HIS VS_OLD VS_DPN VS_PRE VS_TAG VS_TYP VS_OWN VS_BAS VS_DAT VS_LOG OPTIONS HISTDIR DATADIR MENUDIR FONTDIR DESKDIR SR_HOST SR_PKEY SP_HOST SP_PKEY
+      vs_out "Recreate desktop lauchers"     
       export APPDATA="${VS_BAS%/*}"; export INST_DIR="${VS_BAS##*/}"; export VERSION=""  # fit in existing destop template
-      rm -f "${MENUDIR}/Vintagestory.desktop" && vs_user "envsubst < '${VS_BAS}/Vintagestory.desktop' > '${MENUDIR}/Vintagestory.desktop' && chmod -f ugo+x '${MENUDIR}/Vintagestory.desktop'";
-      [ -d "${DESKDIR}" ] && vs_user "ln -sf '${MENUDIR}/Vintagestory.desktop' '${DESKDIR}/Vintagestory.desktop'"
+      rm -f "${MENUDIR}/${VS_DTL}" && vs_user "envsubst < '${VS_BAS}/${VS_DTL}' > '${MENUDIR}/${VS_DTL}' && chmod -f ugo+x '${MENUDIR}/${VS_DTL}'";
+      [ -d "${DESKDIR}" ] && vs_user "ln -sf '${MENUDIR}/${VS_DTL}' '${DESKDIR}/${VS_DTL}'"
       # for i in $(find "${VS_BAS}/assets/fonts" -name *.ttf -type f); do [ -f "${FONTDIR}/${i##*/}" ] || { vs_out "Install gamefont ${i##*/}"; cp -p "${i}" "${FONTDIR}"; }; done
     fi
   else
@@ -872,6 +958,7 @@ vs_adjust_workdir() {
 # Globals:
 #   VS_BAS : SW install base dir
 #   VS_DAT : world data root folder
+#   VS_CFG : server config file name
 # Arguments:
 #   $1 : switch -y|-n to create world folder (opt)
 #   $2 : world id (getopts)
@@ -899,32 +986,34 @@ vs_set_workdir() {
     echo
   fi                              
   [ "${reply}" = 'y' -o "${reply}" = 'Y' ] && vs_gen_workdir "${VS_SUB}"
-  port=$(grep -s '"Port":' "${VS_DAT}/${VS_SUB}/serverconfig.json" | tr -dc '[:digit:]')
+  port=$(grep -s '"Port":' "${VS_DAT}/${VS_SUB}/${VS_CFG}" | tr -dc '[:digit:]')
   export VS_IPN=${port:-${VS_DPN}}
   [ -d "${VS_DAT}/${VS_SUB}" ]
 }
 
 #######################################
-# Read vintagestory ENV from filesystem
+# Read vintagestory ENV (from defaults or text config)
 # Globals:
-#   VS_CFG : configuration file
+#   VS_ETC : editable text configuration file
 # Arguments:
 #   $1   : config file path  
 #   $2-n : list of variable names
 # Returns:
 #   0  : always OK (otherwise abort)
 # Redefines:
-#   VS_CFG : configuration file
+#   VS_ETC : editable configuration file
 #   _TAG   : actual branch stable | unstable
 #   _TYP   : actual type vs_server | vs_archive
 #   _VER   : actual version (install)
 #   _DTS   : actual install timestamp
+#   sets TIME_STYLE to long-iso
 #######################################
 vs_read_env() {
-  VS_CFG="${1}"; shift
-  [ -e "${VS_CFG}" ] || vs_read_var VS_CFG
+  export TIME_STYLE=long-iso
+  VS_ETC="$(readlink -f -- "${1}")"; shift                      # VS_ETC is the link destination (initially taken from the very first call)  
+  [ ! -e "${VS_ETC}" -o -L "${VS_ETC}" ] && vs_read_var VS_ETC  # but maybe neither link nor destination exists, yet (so take default)
   for var in "$@"; do
-    vs_read_var "${var}" "${VS_CFG}"
+    vs_read_var "${var}" "${VS_ETC}"
   done
   set -- $(cat "${VS_BAS}/.tag" 2>/dev/null)
   _TAG="${1}"; 
@@ -935,26 +1024,27 @@ vs_read_env() {
 #######################################
 # Write vintagestory ENV to filesystem
 # Globals:
-#   VS_CFG : configuration file
+#   VS_ETC : editable text configuration file
 # Arguments:
 #   $1-n : list of variable names
 # Returns:
 #   0  : always OK (otherwise abort)
 # Redefines:
-#   VS_CFG : configuration file
+#   VS_ETC : editable text configuration file
 #######################################
 vs_write_env() {
-  [ -z "${VS_CFG}" ] && vs_read_var VS_CFG
-  if [ -w "${VS_CFG}" -o ! -e "${VS_CFG}" ] ; then
-    echo "# VS config setup $(date '+%F %T')" >"${VS_CFG}"
+  local etc
+  [ -z "${VS_ETC}" ] && vs_read_var VS_ETC                      # VS_ETC is either /var/opt/vintagestory (default) $HOME/.vintagestory (setup)
+  if [ -w "${VS_ETC}" -o ! -e "${VS_ETC}" ] ; then              # must be either writable or not exist during setup
+    echo "# VS config setup $(date '+%F %H:%M')" >"${VS_ETC}"
     for var in "$@"; do
-      [ -z "$(eval echo "\$${var}")" ] && vs_read_var "${var}" "${VS_CFG}"
-      echo "${var}='$(eval echo "\$${var}")'" >>"${VS_CFG}"
+      [ -z "$(eval echo "\$${var}")" ] && vs_read_var "${var}" "${VS_ETC}"
+      echo "${var}='$(eval echo "\$${var}")'" >>"${VS_ETC}"
     done
-    local etc="$(readlink -f -- "${0%/*}")/.etc"
-    [ -O "${etc%/*}" ] && vs_user "ln -sf '${VS_CFG}' '${etc}'" # persist VS_CFG redefinition
+    etc="$(readlink -f -- "${0%/*}")/.etc"                      # etc is the "physical" location of the symbolic link file
+    [ -O "${etc%/*}" ] && vs_user "ln -sf '${VS_ETC}' '${etc}'" # persist VS_ETC redefinition
   else
-    vs_out "No privileges to write configuration file $(readlink -f -- "${VS_CFG}")" 1
+    vs_out "No privileges to write configuration file ${VS_ETC}" 1
   fi
 }
 
@@ -971,29 +1061,40 @@ vs_write_env() {
 #   passed variable
 #######################################
 vs_read_var() {
-  local p1="^${1}=['\"]*" p2='[-/_., [:alnum:]]+' val home
+  local p1="^${1}=['\"]*" p2='[-+/_.,: [:alnum:]]+' val home
   val="$(grep -m1 -Eo "${p1}${p2}" "${2}" 2>/dev/null | grep -m1 -Eo "${p2}" | tail -n1)"
   home=$(eval echo "~${VS_OWN}")
   if [ -z "${val#*=}" ] ; then   # use predefined default values
     case ${1} in
-      VS_NUM)      val=5                                      ;;
-      VS_OLD)      val=180                                    ;;
-      VS_DPN)      val=42420                                  ;;
-      VS_TAG)      val='stable'                               ;;
-      VS_TYP)      val='vs_server'                            ;;
-      VS_OWN)      val='vintagestory'                         ;;
-      VS_CFG)      val='/etc/opt/vintagestory'                ;;
-      VS_BAS)      val='/opt/vintagestory/game'               ;;
-      VS_DAT)      val='/var/opt/vintagestory'                ;;
-      VS_LOG)      val='/var/log/vintagestory'                ;;
-      VS_PID)      val='/var/lock/vs-command.pid'             ;;
-      VS_PIF)      val='/var/lock/vs-port.info'               ;;
-      VS_RTR)      val='/var/tmp/vs-command.tag'              ;;
-      HISTDIR)     val="${home}/ApplicationData"              ;;
-      DATADIR)     val="${home}/.config/VintagestoryData"     ;; # or use: "$(csharp -e 'print(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData));' 2>/dev/null)/VintagestoryData"
-      MENUDIR)     val="${home}/.local/share/applications"    ;; # for all: MENUDIR="/usr/share/applications"
-      FONTDIR)     val="${home}/.fonts"                       ;; # for all: FONTDIR="/usr/share/fonts"
-      DESKDIR)     val="$(xdg-user-dir DESKTOP)"              ;; # only for the user
+      VS_HIS)      val=2                                             ;;
+      VS_OLD)      val=180                                           ;;
+      VS_DPN)      val=42420                                         ;;
+      VS_PRE)      val='w'                                           ;; # val='-' to disable
+      VS_TAG)      val='stable'                                      ;;
+      VS_TYP)      val='vs_server'                                   ;;
+      VS_OWN)      val='vintagestory'                                ;;
+      VS_ETC)      val='/etc/opt/vintagestory'                       ;;
+      VS_BAS)      val='/opt/vintagestory/game'                      ;;
+      VS_DAT)      val='/var/opt/vintagestory'                       ;;
+      VS_LOG)      val='/var/log/vintagestory'                       ;;
+      VS_PID)      val='/var/lock/vs-command.pid'                    ;;
+      VS_PIF)      val='/var/lock/vs-port.info'                      ;;
+      VS_RTR)      val='/var/tmp/vs-command.tag'                     ;;
+      VS_BIN)      val='VintagestoryServer.exe'                      ;;
+      VS_DTL)      val='Vintagestory.desktop'                        ;;
+      VS_CFG)      val='serverconfig.json'                           ;;
+      VS_MIG)      val='servermagicnumbers.json Playerdata'          ;;
+      VS_OUT)      val='Logs/server-main.txt'                        ;;
+      VS_CLR)      val='mono'                                        ;;
+      SP_HOST)     val='account.vintagestory.at:443'                 ;;
+      SP_PKEY)     val='l59rOf/3g9fX7Nxyhg457pQkFONpCN7R/ovScanZ0+g' ;;
+      SR_HOST)     val='api.vintagestory.at:443'                     ;;
+      SR_PKEY)     val='l59rOf/3g9fX7Nxyhg457pQkFONpCN7R/ovScanZ0+g' ;;
+      HISTDIR)     val="${home}/ApplicationData"                     ;;
+      DATADIR)     val="${home}/.config/VintagestoryData"            ;; # or use: "$(csharp -e 'print(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData));' 2>/dev/null)/VintagestoryData"
+      MENUDIR)     val="${home}/.local/share/applications"           ;; # for all: MENUDIR="/usr/share/applications"
+      FONTDIR)     val="${home}/.fonts"                              ;; # for all: FONTDIR="/usr/share/fonts"
+      DESKDIR)     val="$(xdg-user-dir DESKTOP)"                     ;; # only for the user
     esac
   fi
   eval "export ${1}='${val#*=}'"
@@ -1002,9 +1103,11 @@ vs_read_var() {
 #######################################
 # Identify and set VS instance parameters
 # Globals:
+#   VS_CLR : C# runtime environment (interpreter)
+#   VS_BAS : SW install base dir
+#   VS_BIN : VS binary name
 #   VS_TYP : type vs_server | vs_archive
 #   VS_OWN : world data owner
-#   VS_BAS : SW install base dir
 #   VS_SUB : server instance (world id)
 #   VS_UI1 : setup usage info
 #   VS_UI2 : reinstall usage info
@@ -1022,10 +1125,12 @@ vs_read_var() {
 # Returns:
 #   0  : always OK (otherwise abort)
 # Redefines:
-#   VS_NUM : threshold (count) to keep backups
+#   VS_HIS : threshold (count) to keep backups
 #   VS_OLD : threshold (days) to maintain world saves
 #   VS_DPN : default port number
+#   VS_PRE : world data naming prefix
 #   VS_BIN : VS binary name
+#   VS_DTL : VS desktop launcher
 #   VS_TAG : branch stable | unstable
 #   VS_TYP : type vs_server | vs_archive
 #   VS_OWN : world data owner
@@ -1037,15 +1142,24 @@ vs_read_var() {
 #   VS_PID : script pidfile
 #   VS_PIF : port information file
 #   VS_RTR : change restart tracker
+#   VS_BIN : VS binary name
+#   VS_DTL : VS desktop launcher
+#   VS_CFG : serverconfig file name
+#   VS_OUT : server output file
+#   VS_CLR : C# runtime environment (interpreter)
+#   VS_MIG : world data migration list
+#   SR_HOST: release api hostname:port 
+#   SR_PKEY: release api pubkey sha256 digest
+#   SP_HOST: package repo hostname:port 
+#   SP_PKEY: package repo pubkey sha256 digest
 #######################################
 vs_set_env() {
-  local etc="$(readlink -f -- "${0%/*}")/.etc" i p err bv
-  vs_read_env ${etc} VS_NUM VS_OLD VS_DPN VS_TAG VS_TYP VS_OWN VS_BAS VS_DAT VS_LOG VS_PID VS_PIF VS_RTR OPTIONS
-  [ ! -e "${etc}" -a -f "${VS_CFG}" -a -O "${etc%/*}" ] && vs_user "ln -sf '${VS_CFG}' '${etc}'"
-  vs_toolcheck 'mono'         '4.2'
+  local etc="$(readlink -f -- "${0%/*}")/.etc" reply='' i p err bv             # etc is the "physical" location of the symbolic link file
+  vs_read_env ${etc} VS_HIS VS_OLD VS_DPN VS_PRE VS_TAG VS_TYP VS_OWN VS_BAS VS_DAT VS_LOG VS_PID VS_PIF VS_RTR OPTIONS VS_BIN VS_DTL VS_CFG VS_MIG VS_OUT VS_CLR SR_HOST SR_PKEY SP_HOST SP_PKEY
+  [ ! -e "${etc}" -a -f "${VS_ETC}" -a -O "${etc%/*}" ] && vs_user "ln -sf '${VS_ETC}' '${etc}'"
+  vs_toolcheck ${VS_CLR}      '4.2'
   vs_toolcheck 'wget'         '1.17.9'
   vs_toolcheck 'screen'       '4.0'
-  export VS_BIN="VintagestoryServer.exe"
   i="$(cat ${VS_PID} 2>/dev/null)"; p="(${0##*/}|vs-.*)"
   if [ ${i:-$$} -ne ${6:-0} ] ; then
     [ ${i:-$$} -ne $$ -a -n "$(pgrep -f "${p}" -F "${VS_PID}" 2>/dev/null)" ]  && vs_out -a "${0##*/} was temporarily locked by another VS command" 1
@@ -1056,12 +1170,14 @@ vs_set_env() {
     getent passwd "${VS_OWN}"    >/dev/null || err="${err} owner ${VS_OWN}"    # need to check SW owner? set -- $(ls -ld "${VS_BAS}/${VS_BIN}" 2>/dev/null) && local owner="${3}"
     getent group  "${VS_OWN}"    >/dev/null || err="${err} group ${VS_OWN}"
     [ -n "${err}"  -a "${1}" != "setup" ]                                      && vs_out -a "VS environment of not found (missing${err}). Please run '${VS_UI1}' with proper privileges" 1
-    [ -z "${_TAG}" -a "${1}" != "setup" ]                                      && vs_out -a "VS environment not properly set up. Please run '${VS_UI1}' with proper privileges" 1
+    [ -z "${_TAG}" -a "${1}" != "setup" -a ! -x "${VS_BAS}/${VS_BIN}" ]        && vs_out -a "VS environment set up incomplete. Please run '${VS_UI1}' with proper privileges" 1
     if [ -f "${VS_BAS}/${VS_BIN}" ] ; then
-      bv=$(vs_user "mono '${VS_BAS}/${VS_BIN}' -v | tr -dc '[:print:]'") # datapath workaround not needed in 1.5.1 ff.
+      bv=$(vs_user "${VS_CLR} '${VS_BAS}/${VS_BIN}' -v | tr -dc '[:print:]'")       # datapath workaround not needed in 1.5.1 ff.
       if [ "${bv}" != "${_VER}" -a "${1}" != "reinstall" ] ; then      
-        vs_out   "Current ${VS_BIN} binary version ${bv} differs from ${_TYP} package tag ${_VER} from ${_DTS}" 1
-        vs_abort "Version ${bv} might be installed manually. Please repair environment by running '${VS_UI2}' with proper privileges" 1
+        vs_out "Current ${VS_BIN} binary version ${bv} out of sync with installation metadata tag (typically caused by manual installation)" 1
+        echo; read -p "CONFIRMATION REQUIRED: Trying to recover metadata (Y/n) " -r reply; echo
+        [ "${reply}" = 'y' -o "${reply}" = 'Y' ]  && vs_idx_base "${VS_BAS}"   || vs_out "You denied the metadata recovery. Be aware that missing metadata might cause unexpected behaviour."
+        vs_read_env "${VS_ETC}" VS_TAG                                         # reads the .tag file again
       fi
       if [ "${VS_TYP}" != 'vs_server' -a "$(id -u)" != "0" ] ; then
         vs_toolcheck 'mono-xmltool'                                            # indicates mono-complete (not needed for a server)
@@ -1126,6 +1242,8 @@ vs_gen_seed() {
 #   VS_DAT : world data root folder
 #   VS_LOG : logging root folder
 #   VS_DPN : default port number
+#   VS_PRE : world data naming prefix
+#   VS_CFG : serverconfig file name
 # Arguments:
 #   $1 : working subdirectory
 #   $2 : world seed (opt.)
@@ -1134,8 +1252,9 @@ vs_gen_seed() {
 #   0  : always OK (otherwise abort)
 #######################################
 vs_gen_workdir() {
-  local nd="${1}" wd="${1#new.$$.}" pn=${3:-${VS_DPN}} cf='serverconfig.json' rn='' wn='' jf='' md=''
-  wn="$(echo ${wd#w[0-9][0-9]-} | tr '-' ' ' | sed 's/\b./\u&/g')"
+  local nd="${1}" wd="${1#new.$$.}" pn=${3:-${VS_DPN}} cf=${VS_CFG} sfix='' rn='' wn='' jf='' md=''
+  [ -n "${VS_PRE}" -a "${VS_PRE}" != '-' ] && sfix="${VS_PRE}[0-9][0-9]-"
+  wn="$(echo ${wd#${sfix}} | tr '-' ' ' | sed 's/\b./\u&/g')"                                                  # extract world name in titlecase from the lowercase folder name
   vs_gen_seed -v rn "${2}" "${wn}"
   jf="{\n \"ServerName\": \"VS\",\n \"Port\": ${pn},\n \"WorldConfig\": {\n  \"Seed\": \"${rn}\",\n  \"SaveFileLocation\": \"${VS_DAT}/${wd}/Saves/${wd}.vcdbs\",\n  \"WorldName\": \"${wn}\",\n },\n}\n"
   for md in ${VS_DAT}/${nd} ${VS_DAT}/${nd}/Saves ${VS_LOG}/${wd} ; do
@@ -1154,8 +1273,11 @@ vs_gen_workdir() {
 # (matching either string part or prefix number)
 # or overall when no input is provided.
 # Non-matching input generates a new world-id.
+#   Depends on metadata to 
 # Globals:
 #   VS_DAT : world data root folder
+#   VS_PRE : world data naming prefix
+#   VS_CFG : serverconfig file name
 # Arguments:
 #   $1 : -v VAR   (opt. variable returns id)
 #   $2 : world id (opt. globbing)
@@ -1163,24 +1285,30 @@ vs_gen_workdir() {
 #   0  : always OK
 #######################################
 vs_get_world_id() {
-  local var='' val='' count=101 sfix="w[0-9][0-9]-" base num nid wid i
+  local var='' val='' sfix='' count=101 data base num nid wid i
+  [ -n "${VS_PRE}" -a "${VS_PRE}" != '-' ] && sfix="${VS_PRE}[0-9][0-9]-"
   case ${1} in
     -v) shift; var=${1}; shift ;;
     --) shift                  ;;
   esac
   i=$(echo "${1%.vcdbs}" | tr '[:upper:]' '[:lower:]' | tr '[:space:][:punct:]' '-' | tr -s '-'); i=${i%-}
   [ $(echo ${VS_DAT}/${i:--}* | wc -w) -gt 1 ]                    && vs_out -a "vs_get_world_id() input parameter '${1}' matches too many world ids" 3 # protect rule 2 from picking wrong world
-  [ "${1#${sfix}}" != "${1}" -a ! -d ${VS_DAT}/${i%%-*}-* ]  && nid="${i%%-*}"                    # preserve valid (unused) input prefixes
-  i="${i#${sfix}}" 
-  for d in $(ls -tdx ${VS_DAT}/${sfix}*/.info 2>/dev/null) ; do 
-    base="${d%/.*}"; base="${base##*/}"; num="${base%%-*}"; count=$((count+1))
-    [  ${num#w}             -eq  ${1:-0}      ] 2>/dev/null       && wid="${base}" && break       # 1. numeric input: number matches to prefix
-    [ "${base#${1:-w}}"     !=  "${base}"     ]                   && wid="${base}" && break       # 2. input without extension (starting with prefix): beginning string part matches (empty input too)
-    [ "${base#${sfix}}"      =  "${1}"        ]                   && wid="${base}" && break       # 3. input without extension and prefix: full name matches exactly
-    [ "${base}"              =  "${1%.vcdbs}" ]                   && wid="${base}" && break       # 4. input with extension: combination of prefix and full name matches exactly
+  [ "${1#${sfix}}" != "${1}" -a ! -d ${VS_DAT}/${i%%-*}-* ]  && nid="${i%%-*}"                  # preserve valid (unused) input prefixes
+  i="${i#${sfix}}"
+  for d in $(ls -tdx ${VS_DAT}/${sfix}*/${VS_CFG} 2>/dev/null) ; do
+    data="${d%/${VS_CFG}}"; base="${data##*/}"; num="${base%%-*}"; count=$((count+1))
+    [ -f "${data}/.info" ] || vs_idx_data "${data}"                                             # collect/create missing metadata from existing configs and logs
+    [  ${num#${VS_PRE}}       -eq  ${1:-0}      ] 2>/dev/null   && wid="${base}" && break       # 1. numeric input: number matches to prefix (without prefix: section before first dash)
+    [ "${base#${1:-${base}}}" !=  "${base}"     ]               && wid="${base}" && break       # 2. input without extension (starting with prefix): beginning string part matches (empty input too)
+    [ "${base#${sfix}}"        =  "${1}"        ]               && wid="${base}" && break       # 3. input without extension and prefix: full name matches exactly
+    [ "${base}"                =  "${1%.vcdbs}" ]               && wid="${base}" && break       # 4. input with extension: combination of prefix and full name matches exactly
   done;
-  [ -z "${wid:-${nid}}" ] && while [ -d ${VS_DAT}/w${count#1}-* ] ; do count=$((count-1)) ; done  # validate an unused prefix
-  val="${wid:-${nid:-w${count#1}}-${i:-new-world}}"                                               # construct a (new) world name
+  if [ -n "${sfix}" ] ; then
+    [ -z "${wid:-${nid}}" ] && while [ -d ${VS_DAT}/${VS_PRE}${count#1}-* ] ; do count=$((count-1)) ; done  # validate an unused prefix
+    val="${wid:-${nid:-${VS_PRE}${count#1}}-${i:-new-world}}"                                               # construct a (new) world name with prefix
+  else
+    val="${wid:-${i:-new-world}}"                                                                           # construct a (new) world name without prefix
+  fi
   [ -n "${var}" ] && eval "${var}='${val}'" || echo "${val}"
 }
 
@@ -1188,9 +1316,13 @@ vs_get_world_id() {
 # Migrate world saves (rename, config)
 # Precondition: stopped and backup done
 # Globals:
-#   VS_NUM : threshold (count) to keep backups
+#   VS_HIS : threshold (count) to keep backups
 #   VS_DAT : world data root folder
 #   VS_OWN : world data owner
+#   VS_PRE : world data naming prefix
+#   VS_CFG : serverconfig file name
+#   VS_MIG : world data migration list
+#   VS_OUT : server output file
 # Arguments:
 #   $1 : full world saves path to migrate/relocate
 #   $2 : vcdbs name (opt. globbing, extension)
@@ -1200,45 +1332,46 @@ vs_get_world_id() {
 #   1  : Nothing found to relocate
 #######################################
 vs_migrate() {
-  local saves vcdbs match flags files wi wn wd sd td rn retval
+  local sfix='' saves vcdbs match flags files wi wn wd sd td rn retval mf
+  [ -n "${VS_PRE}" -a "${VS_PRE}" != '-' ] && sfix="${VS_PRE}[0-9][0-9]-"
   saves="${1:-.}"; vcdbs="${2%.vcdbs}"
   flags="-type f -group ${VS_OWN} -size +99k"
   files="$(find ${saves} ${flags} -name "${vcdbs:-*}.vcdbs" | sort)"
   if [ -n "${files}" ] ; then
-    echo "${files}" | grep -q "${saves}/Saves/${3}.vcdbs" && grep -q "${3}.vcdbs" "${saves}/serverconfig.json" 2>/dev/null && match="${saves}/Saves/${3}.vcdbs"
+    echo "${files}" | grep -q "${saves}/Saves/${3}.vcdbs" && grep -q "${3}.vcdbs" "${saves}/${VS_CFG}" 2>/dev/null && match="${saves}/Saves/${3}.vcdbs"
     echo "${files}" | while read line; do
       vcdbs="${line%.vcdbs}"; vcdbs="${vcdbs##*/}"; vcdbs="${vcdbs#default}"
       vs_get_world_id -v wi "${vcdbs:-new-world}.vcdbs"                                                                       # world id (files, folders) prefixed in lowercase
-      wn="$(echo ${wi#w[0-9][0-9]-} | tr '-' ' ' | sed 's/\b./\u&/g')"                                                        # world name (title) without prefix in titlecase
+      wn="$(echo ${wi#${sfix}} | tr '-' ' ' | sed 's/\b./\u&/g')"                                                             # world name (title) without prefix in titlecase
       wd="${3:-${wi}}"                                                                                                        # world data folder (e.g. given by parameter 3)
       sd="${line%/Saves/*.vcdbs}"                                                                                             # source data folder (path)
       td="${VS_DAT}/new.$$.${wd}"                                                                                             # target data folder (path)
       vs_out "Migrate world '${vcdbs}' found in '${saves}' to v${_VER} subfolder '${wd}' ..." -1
-      rn="$(cat "${sd}/Logs/server-main.txt" 2>/dev/null | tr -d '\000' | grep '] Seed: ')"; rn="${rn#*Seed: }"               # no issue if no seed logged
+      rn="$(cat "${sd}/${VS_OUT}" 2>/dev/null | tr -d '\000' | grep '] Seed: ')"; rn="${rn#*Seed: }"                          # no issue if no seed logged
       vs_gen_seed -v rn "${rn}" "${wn}"
       vs_gen_workdir "new.$$.${wd}" "${rn}" &&  touch -cr "${line}" "${td}/.info"                                             # new dir including .info file (pointing to current version)
       [ ! -f "${line}" ] || vs_user "mv -f '${line}' '${td}/Saves/${wi}.vcdbs'                                   2>/dev/null" || vs_out -a "Unexpected condition E#x2 during file move" 3
-      if [ -d "${sd}/Playerdata" -a "${line}" = "${match:-${line}}" ] ; then
-        vs_user "mv -f ${sd}/Playerdata '${td}'                                                                  2>/dev/null" # no issue if no previous Playerdata
-      fi
-      if [ -f "${sd}/serverconfig.json" -a "${line}" = "${match:-${line}}" ] ; then
+      if [ "${line}" = "${match:-${line}}" ] ; then
+        for mf in ${VS_CFG} ${VS_MIG}; do
+          [ -e "${sd}/${mf}" ] && vs_user "mv -f ${sd}/${mf} '${td}'                                             2>/dev/null" # no issue if no migration files
+        done
+        vs_set_cfg "${td}" -sf "${VS_DAT}/${wi}/Saves/${wi}.vcdbs" -wn "${wn}" -sn "${rn}"       
+        #vs_user "sed -i 's/\"[^\"]*.vcdbs\"/\"${VS_DAT}/${wi}/Saves/${wi}.vcdbs\"/' '${td}/${VS_CFG}'            2>/dev/null" # no issue if no json files
+        #vs_user "sed -i 's/\"WorldName\":[^,]*,/\"WorldName\": \"${wn}\",/' '${td}/${VS_CFG}'                    2>/dev/null" # no issue if no json files
+        #vs_user "sed -i 's/\"Seed\":[^,]*,/\"Seed\": \"${rn}\",/' '${td}/${VS_CFG}'                              2>/dev/null" # no issue if no json files
         vs_user "mv -f ${sd}/.info '${td}/.old'                                                                  2>/dev/null" # no issue if no old .info copy
-        vs_user "cp -f ${sd}/server*.json '${td}'                                                                2>/dev/null" # no issue if no json files
-        vs_user "sed -i 's/\"[^\"]*.vcdbs\"/\"${VS_DAT}/${wi}/Saves/${wi}.vcdbs\"/' '${td}/serverconfig.json'    2>/dev/null" # no issue if no json files
-        vs_user "sed -i 's/\"WorldName\":[^,]*,/\"WorldName\": \"${wn}\",/' '${td}/serverconfig.json'            2>/dev/null" # no issue if no json files
-        vs_user "sed -i 's/\"Seed\":[^,]*,/\"Seed\": \"${rn}\",/' '${td}/serverconfig.json'                      2>/dev/null" # no issue if no json files
       fi
     done
-    retval=$?; [ ${retval} -le 1 ]                                                                                      || exit ${retval} # catch abort from piped 'while' (subshell)
-    for wi in ${VS_DAT}/new.$$.w[0-9][0-9]-* ; do
+    retval=$?; [ ${retval} -le 1 ]                                                                                            || exit ${retval} # catch abort from piped 'while' (subshell)
+    for wi in ${VS_DAT}/new.$$.* ; do
       td="${VS_DAT}/${wi##*/new.$$.}"
       vs_out "Make migrated world folder '${td}' accessible" -1
-      [ -d "${wi}" -a   -d "${td}" ] && mv -fT "${td}" "${VS_DAT}/replaced_$(date +%F_%T)_${wi##*/new.$$.}"                   # move the 'to-be-replaced' subfolder out of the way
+      [ -d "${wi}" -a   -d "${td}" ] && mv -fT "${td}" "${VS_DAT}/replaced_$(date +%F_%H:%M)_${td##*/}"                       # move the 'to-be-replaced' subfolder out of the way
       [ -d "${wi}" -a ! -d "${td}" ] && mv -fT "${wi}" "${td}"                                                                # relocate the post-migration target subfolder
       [ -d "${wi}" ] && vs_out "Moving ${wi} to ${td} failed. Manual cleanup required." 2
+      ls -tdx ${VS_DAT}/replaced_*_${td##*/} 2>/dev/null | sed -e "1,${VS_HIS}d" | xargs rm -fr                               || vs_out "Housekeeping of replaced world folders failed." 0
     done 
-    ls -tdx ${VS_DAT}/replaced_*_w[0-9][0-9]-* 2>/dev/null | sed -e "1,${VS_NUM}d" | xargs rm -fr                             || vs_out "Housekeeping of replaced world folders failed." 0
-  else
+  else        
     vs_out "World '${vcdbs}' from '${saves}' is already removed" 1
   fi
 }
@@ -1275,6 +1408,7 @@ vs_archive() {
 
 #######################################
 # Manually maintain legacy world saves
+#   Uses metadata to identify already migrated folders
 # Globals:
 #   VS_OLD : threshold (days) to maintain world saves
 #   VS_DAT : world data root folder
@@ -1346,10 +1480,13 @@ vs_maintain_legacy() {
 #   Restart world directly requested by restart commmand (no flag)
 #   Restart world implicitly requested by recover command (-r flag)
 #   Restart all needed after software change (-c flag and real change)
+#   Restart depends on metadata to define the restart scope (.info)
+#   Restart depends on metadata to detect software changes (.tag)
 # Globals:
 #   VS_BAS : SW install base dir
 #   VS_DAT : world data root folder
 #   VS_RTR : change restart tracker
+#   VS_PRE : world data naming prefix
 # Arguments:
 #   $1 : change | recover flag (opt.)
 #   $2 : server instance (world id) 
@@ -1357,22 +1494,25 @@ vs_maintain_legacy() {
 #   0  : always OK (otherwise abort)
 #######################################
 vs_restart() {
-  local flag world changed wd run_info
+  local sfix='' flag world changed wd run_info run
   case ${1} in
     -c) shift; flag='-c'                  ;;
     -r) shift; flag='-r'                  ;;
     --) shift                             ;;
   esac
-  world="${VS_DAT}/${1:-w[0-9][0-9]-*}"                                # world id not set in case of update/reinstall, default matches to all valid folders
+  [ -n "${VS_PRE}" -a "${VS_PRE}" != '-' ] && sfix="${VS_PRE}[0-9][0-9]-"
+  world="${VS_DAT}/${1:-${sfix}*}"                                     # world id not set in case of update/reinstall, default matches to all valid folders
   changed="$(diff -q ${VS_BAS}/.tag ${VS_RTR} 2>&1)"                   # real change means: version differs and restart has not done yet
   if [ -n "${changed}" -o "${flag}" != '-c' ] ; then
     for wd in ${world} ; do
-      if [ -d "${wd}" ] ; then
+      if [ -d "${wd}" -a -f "${wd}/.info" ] ; then
         run_info=$(cat "${wd}/.info" 2>/dev/null)
         vs_stop "${wd##*/}" "${run_info}"                              # all instances will be stopped
-        [ "${flag}" = '-c' ]             && vs_backup  "${wd}"         # including migration in the case of a version change
-        [ "${flag}" = '-r' ]             && vs_recover "${wd##*/}"     # including migration in the case of a backup recovery (means world id should be set) 
-        [ "${run_info%:*}" = "STARTED" ] && vs_start   "${wd##*/}"     # decide to start per world id
+        run="${run_info%STARTED:*}"
+        [ "${run_info%:*}" = "STARTED"    ] && run='Y' || run=''       # identify instance to be started
+        [ "${flag}" = '-r'                ] && vs_recover "${wd##*/}"  # including migration in the case of a backup recovery (means world id should be set) 
+        [ "${flag}" = '-c' -a -n "${run}" ] && vs_backup  "${wd}"      # including migration in the case of a version change
+        [ -n "${run}"                     ] && vs_start   "${wd##*/}"  # decide to start per world id
       fi
     done
     vs_user "cp -f '${VS_BAS}/.tag' '${VS_RTR}'"                       # persist the information a restart sequence is performed (even if no server has been started)
@@ -1395,12 +1535,12 @@ vs_restart() {
 #   1-n : NOK (depends on command)
 #######################################
 main() {
-  local keywords task o b d w v l p t s 
+  local keywords task o b d w v l p t s x
   keywords="$(printf "start\nstop\nrestart\nbackup\nrecover\nupdate\nreinstall\nrollback\nsetup\nstatus\ncommand\n")"
   if echo "${1}" | grep -qwF "${keywords}" ; then
     task="${1}"; shift
   fi
-  while getopts ":o:b:d:w:v:l:p:USPCRT" opt; do
+  while getopts ":o:b:d:w:v:l:p:s:USPCRT" opt; do
       case ${opt} in
         o) o="${OPTARG}"                                                        ;;
         b) b="${OPTARG}"                                                        ;;
@@ -1409,6 +1549,7 @@ main() {
         v) v="${OPTARG}"                                                        ;;
         l) l="${OPTARG}"                                                        ;;
         p) p="${OPTARG}"                                                        ;;
+        s) x="${OPTARG}"                                                        ;;
         U) t='unstable'                                                         ;;
         S) t='stable'                                                           ;;
         P) t='pre'                                                              ;;
@@ -1442,7 +1583,7 @@ main() {
     update)    vs_cmd_priv   "${VS_OWN}" && vs_update    && vs_restart -c        ;;
     reinstall) vs_cmd_priv   "${VS_OWN}" && vs_reinstall && vs_restart -c        ;;
     rollback)  vs_cmd_priv   "${VS_OWN}" && vs_rollback  && vs_restart -c        ;;
-    setup)     vs_cmd_priv   "${VS_OWN}" && vs_setup "${s}" "${o}" "${b}" "${d}" ;;
+    setup)     vs_cmd_priv   "${VS_OWN}" && vs_setup "${s}" "${o}" "${b}" "${d}" "${x}" ;;
     status)    vs_get_status "${VS_SUB}"                                         ;;
     command)   vs_command    "${VS_SUB}" "$*"                                    ;; 
     *)         vs_usage                                                          ;;
@@ -1463,9 +1604,5 @@ main "$@"                                                                       
 #######################################
 
 # see https://github.com/zkol/vsadmin#how-the-script-works
-
-
-#  _test=$(echo | openssl s_client -showcerts -servername "${host}" -connect "${host}:${port}" 2>/dev/null | openssl x509 -inform pem -noout -pubkey) || vs_out -a "Unexpected condition E#17" 3
-#  _test=$(echo "${_test}" | openssl pkey -pubin -outform der | openssl dgst -sha256 -binary | openssl enc -base64) || vs_out -a "Unexpected condition E#18" 3
 
 

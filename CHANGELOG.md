@@ -104,7 +104,17 @@ Overview of all changes in the admin scripts for Vintage Story
 * Tweak: Host connection test simplified (dependency from openssl eliminated)
 * Tweak: Keep a (manually) linked configuration file during update/reinstall
 
-### 2018-03-29 Script version 1.5.1.6 (development)
+### 2018-04-01 Script version 1.5.1.6 (testing)
+* Refactoring: new functions `vs_idx_base`, `vs_idx_data`, `vs_set_cfg` to prepare script modularization
+* Fixed: setup of folder group permissions for a non-root user now considers the right folders
+* Fixed: link to editable configuation file sometimes messed up
+* Fixed: reinstall of same version triggers a world data migration (which was not necessary) 
+* Tweak: setup considers existing install to adjust/relocate/update (instead of always doing a full reinstall)
+* Tweak: restart on version change considers only started worlds for backup/migration (instead of all worlds) 
 * Tweak: weighted housekeeping threshold parameter (factor 1 for directories, factor 3 for files)
+* Tweak: added host connection parameters to the editable text configuration (centralizing static constants) 
+* Tweak: adjusted timestamp format to long-iso (according to POSIX file date handling with ls)
+* Tweak: Try to sync installation metadata (on confirmation) before abort
+* Tweak: Reduced dependency from naming conventions: World folder suffix is now configurable (and can be disabled by -s -)
 
 
