@@ -122,4 +122,4 @@ Overview of all changes in the admin scripts for Vintage Story
 * Fixed: Last data access not properly recognized without metadata
 * Fixed: Data replaced by recovery misinterpreted with suffix disabled
 * Fixed: Wrong (non-existing) world name not properly handled with suffix disabled
-
+* Fixed: Match pattern of the process signature is not backward compatible

@@ -39,6 +39,7 @@
 #            Fixed: Last data access not properly recognized without metadata
 #            Fixed: Data replaced by recovery misinterpreted with suffix disabled
 #            Fixed: Wrong (non-existing) world name not properly handled with suffix disabled
+#            Fixed: Match pattern of the process signature is not backward compatible
 #
 
 #######################################
@@ -225,10 +226,11 @@ vs_get_status() {
   esac
   [ -z "${1}" ] && vs_out -a "vs_get_status() mandatory parameter missing: server instance (world id)" 3
   world="${1}";
-  inst="${VS_BAS}/${VS_BIN} --dataPath ${VS_DAT}/${world}"                # each instance is defined by its own data path
+  inst="${VS_BIN} --dataPath ${VS_DAT}/${world}"                          # each instance is defined by its own data path
+  #inst="${VS_CLR} ${VS_BAS}/${VS_BIN} --dataPath ${VS_DAT}/${world}"     # each instance is defined by its own data path
   run_info=$(cat "${VS_DAT}/${world}/.info"  2>/dev/null)
   target_status="${run_info%:*}"
-  _pid=$(pgrep -fx "${VS_CLR} ${inst}.*")          || [ $? -eq 1 ]        || vs_out -a "Unexpected condition E#10" 3
+  _pid=$(pgrep -f "${inst}.*")                     || [ $? -eq 1 ]        || vs_out -a "Unexpected condition E#10" 3
   if [ ! -d "${VS_DAT}/${world}" ] ; then
     val=1; [ -z "${var}" ]   && vs_out "World ${world} not found" ${val} 
   elif [ -z "${_pid}" ] ; then
@@ -236,7 +238,7 @@ vs_get_status() {
   else     # workaround: ensure that service is not about to terminate (server might be waiting for confirmation input after crash)
     vs_command -v _stat_msg "${world}" "stats"     || [ $? -eq 1 ]        || vs_out "Indeterminate ${inst} (to be ${target_status:-STOPPED})" 2 || return $?  
     sleep .5
-    _pid=$(pgrep -fx "${VS_CLR} ${inst}.*")        || [ $? -eq 1 ]        || vs_out -a "Unexpected condition E#11" 3
+    _pid=$(pgrep -f "${inst}.*")                   || [ $? -eq 1 ]        || vs_out -a "Unexpected condition E#11" 3
     if [ -z "${_pid}" ] ; then
       val=1; [ -z "${var}" ] && vs_out "${inst} (to be ${target_status:-STOPPED}) is not running" ${val} 
     elif [ -z "${_stat_msg}" ] ; then
