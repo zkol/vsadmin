@@ -117,4 +117,9 @@ Overview of all changes in the admin scripts for Vintage Story
 * Tweak: Try to sync installation metadata (on confirmation) before abort
 * Tweak: Reduced dependency from naming conventions: World folder suffix is now configurable (and can be disabled by -s -)
 
+### 2018-04-02 Script version 1.5.1.7 (testing)
+* Fixed: $HOME of software owner with desktop environment not properly set up
+* Fixed: Last data access not properly recognized without metadata
+* Fixed: Data replaced by recovery misinterpreted with suffix disabled
+* Fixed: Wrong (non-existing) world name not properly handled with suffix disabled
 
