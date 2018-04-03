@@ -45,7 +45,7 @@ You can also update the setup script this way.
 
 The script needs as a minimum
 * computer with internet access (at least to set everything up)
-* wget package (at least version 1.17.9 that supports keypinning) used by the script itself
+* wget package (at least version 1.17.9 that supports keypinning) used by the script itself, [e.g. 1.19.1 for ubuntu](security.ubuntu.com/ubuntu/pool/main/w/wget/wget_1.19.1-3ubuntu1.1_amd64.deb)
 * mono package (at least version 4.2, latest stable version is highly recommended) used by Vinage Story
 
 ### Reduced install
