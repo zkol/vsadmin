@@ -74,7 +74,8 @@ For a complete server/client install (option -C) capable to run the client too, 
 
 * ` -o OWNER   `  Set custom owner name for software setup.
 * ` -b BASEDIR `  Set custom full directory path for software installation.
-* ` -d DATADIR `  Set custom full directory path for world data access
+* ` -d DATADIR `  Set custom full directory path for world data access.
+* ` -s SUFFIX  `  Set custom static suffix as naming convention for world data.
 * ` -C | -R    `  Consider complete|reduced package for installation.
 
 ### General options
@@ -255,14 +256,76 @@ This is a list of potential topics for the next script versions.
 1. Manage to consistently rename worlds/datafiles
 1. Introduce to execute prepared server commandfiles, e.g. for world upgrade by block remapping
 
-## How the script works
+## How the Script Works
 
 This script relies on some environment parameters: 
 1. a bit of meta data to define which custom locations were chosen and which stable/unstable package has been installed
 1. a naming convention to manage different datafolders with the means of a shell script
 1. an inital setup that defined and persisted the configurable environment parameters (and saved them to either /etc/opt/vintagestory or a local $HOME/.vintagestory file)
-1. the success of a integrity check that is performed on each script use
+1. the success of a integrity check that is performed on each script use by the function **` vs_set_env `**
 
-This means manual moving and renaming will most probably mess up everything (means the script complains). 
+This means manual moving and renaming will most probably mess up everything (causing the script to complain).
+
+### Identifying World data
+
+To access specific world data, the server must of course know the specific path to find this data. Beside the default location thre are two script options to specify this path. 
+
+1. The world data access path consists of **` DATADIR/SUFFIX-WORLD `**
+1. **` DATADIR `** is the main data path that can be set by setup task (option -d)
+1. **` SUFFIX- `** is a generated suffix that can be customized or disabled by setup task (option -s)
+1. **` SUFFIX-WORLD `** is the world identifier can be set by every regular task  (option -w)
+1. The world identifier does not only name the world data subdirectory, it is also used to name saves file, backup files, etc.
+1. **` WORLD `** corresponds to the serverconfig.json parameter "WorldName", but lowercase instead of titlecase and dashes instead of whitespaces
+1. When no name information available, **` WORLD `** is set to 'new-world' (corresponding to "WorldName": "New World") 
+1. For convenience, the world identifier may contain a configurable statix suffix with a double-digit ordinal number, seperated by a dash (e.g. 'w01-')
+1. When available it is sufficient to specify **` SUFFIX- `** to select the corresponding world data 
+1. If a tasks does not specify any world identifier, the most recently accessed folder is selected
+1. To perfom the preparation and selection of the world identifier the script uses the function **` vs_set_workdir `**  called by **` vs_set_env `** 
+
+### Tracking the Status Information
+
+Based on the selected world identifier, the script tracks the status of the corresponding world.
+
+1. The target status can be either **` STOPPED `** or **` STARTED `** (changed by stop or start task)
+1. The restart task considers the previously set target status (no restart when  **` STOPPED `**)
+1. The target status is persisted in the meta data file **` DATADIR/SUFFIX-WORLD/.info `**
+1. If no target status known, the the actual status is assumed to be the target status
+1. This is done by the function **` vs_idx_data `**
+1. The actual status is derived from process list and log file (considering the information in serverconfig.json)
+1. When determining the actual status, the following addtional information is obtained
+   * World name (world identifier is master)
+   * World seed (logfile is master)
+   * Last server version (logfile is master)
+   * Last server port (serverconfig.json is master)
+1. Status information is consumed in the following situations
+   * **` vs_gen_status `** reads this target status to show it in the logged output (no depending logic)
+   * **` vs_backup `** reads version to parametrize the backup file name
+   * **` vs_migrate `** renames meta data of source during migration to avoid conflicts with new metadata
+   * **` vs_maintain_legacy `** checks if metadata exist and skip those folders as already migrated 
+   * **` vs_restart `** checks target status to decide if the world will be restarted or not
+1. Status information is updated in the following situations
+   * New world folder is created by function **` vs_gen_workdir `** (status **` STOPPED `**)
+   * Existing world folder without meta data file is selected by **` vs_get_world_id `** (actual status)
+   * **` vs_gen_workdir `** creates a meta data file if missing (status **` STOPPED `**)
+   * **` vs_get_world_id `** creates a meta data file if missing (actual status)
+   * **` vs_stop  `** reads target status to show it in the logged output (no dependig logic), new status is set afterwards via **` vs_idx_data `**
+   * **` vs_start `** reads and uses version to detect a version change, new status is set afterwards via **` vs_idx_data `**
+   * **` vs_recover `** merges current and restored status, **` vs_idx_data `** is called afterwards, but not used to update the status!
+
+
+# issue: vintagestory not found in passwd when doing setup
+
+ 
 More info will be added later.
+
+
+
+
+
+
+
+
+
+
+
 

@@ -1,6 +1,6 @@
 #!/bin/sh
 # /etc/init.d/vintagestory.sh
-# version 1.5.1.7 2018-04-02 (YYYY-MM-DD)
+# version 1.5.1.8 2018-05-10 (YYYY-MM-DD)
 #
 ### BEGIN INIT INFO
 # Provides:   vintagestory
@@ -40,7 +40,10 @@
 #            Fixed: Data replaced by recovery misinterpreted with suffix disabled
 #            Fixed: Wrong (non-existing) world name not properly handled with suffix disabled
 #            Fixed: Match pattern of the process signature is not backward compatible
-#
+# 2018-12-26 Script version 1.5.1.8
+#            Fixed: Restart finishes with wrong result message
+#            Tweak: Replaced the use of pgrep with posix compliant code
+#            Tweak: Updated the VintageStory Public Keys
 
 #######################################
 # Standard output (logger) and exit
@@ -203,6 +206,30 @@ vs_toolcheck() {
 }
 
 #######################################
+# Check running process instance
+# Globals:
+#   _CNT : count of matching process instances
+#   _USR : effective username of the last matching process instance
+#   _PID : process id of the last matching process instance
+# Arguments:
+#   $1 : process commandline (to be matched from the beginning)
+# Returns:
+#   0  : process is running
+#   1  : process is not running
+#######################################
+vs_procheck() {
+  local p
+  unset _PID _USR _CNT 
+  while read p; do
+    _PID=${p#* }; _PID=${_PID%% *}
+    _USR=$(ps -p ${_PID} -o user= 2>/dev/null) && _CNT=$((_CNT+1))
+  done <<EOF
+  "$(ps -eo stime=,pid=,args= | grep -E "[0-9] ${1}" | sort)"f
+EOF
+  [ ${_CNT:=0} -gt 0 ]
+}
+
+#######################################
 # Get the current VS server instance run status
 #   Derives the "to be" status from optional metadata (.info)
 # Globals:
@@ -226,20 +253,19 @@ vs_get_status() {
   esac
   [ -z "${1}" ] && vs_out -a "vs_get_status() mandatory parameter missing: server instance (world id)" 3
   world="${1}";
-  inst="${VS_BIN} --dataPath ${VS_DAT}/${world}"                          # each instance is defined by its own data path
-  #inst="${VS_CLR} ${VS_BAS}/${VS_BIN} --dataPath ${VS_DAT}/${world}"     # each instance is defined by its own data path
+  inst="${VS_CLR} ${VS_BAS}/${VS_BIN} --dataPath ${VS_DAT}/${world}"     # each instance is defined by its own data path
+  ###
   run_info=$(cat "${VS_DAT}/${world}/.info"  2>/dev/null)
   target_status="${run_info%:*}"
-  _pid=$(pgrep -f "${inst}.*")                     || [ $? -eq 1 ]        || vs_out -a "Unexpected condition E#10" 3
+  ###
   if [ ! -d "${VS_DAT}/${world}" ] ; then
     val=1; [ -z "${var}" ]   && vs_out "World ${world} not found" ${val} 
-  elif [ -z "${_pid}" ] ; then
+  elif ! vs_procheck "${inst}"; then
     val=1; [ -z "${var}" ]   && vs_out "${inst} (to be ${target_status:-STOPPED}) is not running" ${val} 
   else     # workaround: ensure that service is not about to terminate (server might be waiting for confirmation input after crash)
     vs_command -v _stat_msg "${world}" "stats"     || [ $? -eq 1 ]        || vs_out "Indeterminate ${inst} (to be ${target_status:-STOPPED})" 2 || return $?  
     sleep .5
-    _pid=$(pgrep -f "${inst}.*")                   || [ $? -eq 1 ]        || vs_out -a "Unexpected condition E#11" 3
-    if [ -z "${_pid}" ] ; then
+    if ! vs_procheck "${inst}"; then
       val=1; [ -z "${var}" ] && vs_out "${inst} (to be ${target_status:-STOPPED}) is not running" ${val} 
     elif [ -z "${_stat_msg}" ] ; then
       val=2; [ -z "${var}" ] && vs_out "${inst} (to be ${target_status:-STOPPED}) is running but not responding" ${val}
@@ -331,10 +357,12 @@ vs_stop() {
   world="${1}" ; shift
   [ -d "${VS_DAT}/${world}" ] || vs_out -a "World ${world} not found" 3
   inst="${VS_BAS}/${VS_BIN} --dataPath ${VS_DAT}/${world}"                          # each instance is defined by its own data path
+  ###
   run_info=$(cat "${VS_DAT}/${world}/.info" 2>/dev/null)
   target_status="${1:-STOPPED:${run_info#*:}}" 
   vs_idx_data "${VS_DAT}/${world}" "${target_status}"                               # update metadata
   vs_get_status -v status "${world}"
+  ###
   case "${status}" in
     1)  vs_out "${inst} (to be ${target_status%:*}) was not running." -1
         [ "$(cat ${VS_PIF}.${VS_IPN} 2>/dev/null)" = "${world}" ] && rm -f "${VS_PIF}.${VS_IPN}"
@@ -386,10 +414,12 @@ vs_start() {
   other=$(cat "${VS_PIF}.${VS_IPN}" 2>/dev/null)
   [ -n "${other}" -a "${other}" != "${world}" ] && vs_out -a "Other world ${other} previously allocated port ${VS_IPN}. Check and try again (maybe stop ${other} or reboot)" 2
   inst="${VS_BAS}/${VS_BIN} --dataPath ${VS_DAT}/${world}"                                     # each instance is defined by its own data path
+  ###
   run_info=$(cat "${VS_DAT}/${world}/.info" 2>/dev/null)
   target_status="STARTED:${_VER}" 
   vs_get_status -v status "${world}"
   vs_idx_data "${VS_DAT}/${world}" "${target_status}"                                          # update metadata
+  ###
   case "${status}" in
     0)  vs_out "${inst} (to be ${target_status%:*}) is already running." -1 ;;
     1)  vs_out "Starting ${inst} (to be ${target_status%:*}) ..." -1
@@ -408,12 +438,47 @@ vs_start() {
           vs_out "${inst} (to be ${target_status%:*}) could not be started." 2
         else
           vs_out "${inst} (to be ${target_status%:*}) is started." -1
+          if [ -n "${VS_TST}" ]; then 
+            vs_command -k '] Message' "${world}" "announce WARNING - ${inst} was started in TEST MODE" >/dev/null
+          fi 
         fi
-        [ -n "${VS_TST}" ] && vs_command -k '] Message' "${world}" "announce WARNING - ${inst} was started in TEST MODE" >/dev/null 
         ;;
     2)  vs_out "${inst} (to be ${target_status%:*}) is already running but not responding. Check an try again" 1 ;;
   esac
   return $?
+}
+
+#######################################
+# Launch VS as daemon process
+# Globals:
+#   VS_BIN : VS binary name
+#   VS_BAS : SW install base dir
+#   VS_DAT : world data root folder
+#   VS_RTR : change restart tracker
+#   OPTIONS
+# Arguments:
+#   $1 : server instance (world id) 
+#   $2 : target status (opt.) 
+# Returns:
+#   0  : started
+#   1  : not responding
+#   2  : not started
+#######################################
+vs_launch() {
+  local c="mono ${VS_BAS}/${VS_BIN} --dataPath ${VS_DAT}/${world} ${OPTIONS}"
+  local o="${0}.out"
+  local p='/tmp/vs.command'                          #/var/run/vintagestory/w01.command
+  local n=0
+  [ -p "${p}" ] || mkfifo -m 660 "${p}"
+  if [ -t 0 ] ; then
+    echo "command - pid $$"                          # TODO command pidfile handling (remove) 
+    setsid "$(readlink -f -- ${0})" "$@" </dev/null  >"${o}" 2>&1  &
+  else
+    echo "daemon launch - pid $$"                    # TODO daemon pidfile handling (create)
+    cd / 
+    exec nice -n ${n} ${c} "$@"          <"${p}"    >>"${o}" 2>&1
+  fi
+  echo '/stats' > "${p}"
 }
 
 #######################################
@@ -438,10 +503,12 @@ vs_recover() {
     rm -fr /tmp/vs-recover.*  
     vs_user "mkdir -m 775 -p /tmp/vs-recover.$$                     2>/dev/null"  || vs_out -a "Unexpected condition E#19" 3
     vs_user "tar xzf ${bak} -C /tmp/vs-recover.$$                   2>/dev/null"  || vs_out -a "Unexpected condition E#20" 3
+    ###
     io=$(cat "/tmp/vs-recover.$$/.info"                             2>/dev/null)
     in=$(cat "${VS_DAT}/${world}/.info"                             2>/dev/null)
     vs_idx_data /tmp/vs-recover.$$
     vs_user "printf '${in%:*}:${io#*:}' >'/tmp/vs-recover.$$/.info' 2>/dev/null"  || vs_out -a "Unexpected condition E#25" 3
+    ###
     vs_migrate "/tmp/vs-recover.$$" '*.vcdbs' "${world}"
     rm -fr "/tmp/vs.recover.$$"
     vs_out "Finished recovery of ${world}" 0
@@ -476,8 +543,10 @@ vs_backup() {
   num=$((${VS_HIS}*3))                                                                                            # 3 times the threshold for file based housekeeping use (compared to directory based)
   wd="${1}"; vs_get_world_id -v wn "${wd##*/}"
   [ -d "${VS_DAT}/${wn}" ] || vs_out -a "World ${wn} not found" 3
+  ###
   ri=$(cat "${VS_DAT}/${wn}/.info" 2>/dev/null); ri="${ri#*:}"
   bk="$(date +%F_%H:%M)_v${ri:--legacy}"; bn="${bk}_${wn}.vcdbs"
+  ###
   fl="Backups/${bn} ${VS_CFG} ${VS_MIG}"
   fn="${VS_DAT}/backup/vs_${wn}_${bk}"
   if [ -d "${VS_DAT}/backup" ] ; then
@@ -589,12 +658,14 @@ vs_idx_base() {
 #######################################
 # Collect instance metadata (write .info)
 # Globals:
+#   VS_CLR : C# runtime environment (interpreter)
+#   VS_BAS : SW install base dir
 #   VS_BIN : VS binary name
 #   VS_CFG : server config file name
 #   VS_OUT : server output file
 # Arguments:
 #   $1 : world data folder (opt. with wildcard)
-#   $2 : status info (opt.)
+#   $2 : full status info to be set (opt.)
 # Returns:
 #   0  : always OK (otherwise abort)
 #######################################
@@ -613,11 +684,11 @@ vs_idx_data() {
         lp=$(cat "${wd}/${VS_OUT}" 2>/dev/null | tr -d '\000' | grep 'Server running on Port ' ); lp=${lp#*Server running on Port }
         lv=$(cat "${wd}/${VS_OUT}" 2>/dev/null | tr -d '\000' | grep '] Server v'              ); lv=${lv#*] Server v}
         lr=$(cat "${wd}/${VS_OUT}" 2>/dev/null | tr -d '\000' | grep '] Stopped the server'    ); lr=${lr:+STOPPED}
-        if pgrep -cf "${VS_BIN} --dataPath ${wd}" >/dev/null ; then
+        if vs_procheck "${VS_CLR} ${VS_BAS}/${VS_BIN} --dataPath ${wd}"; then
           [ -n "${lr}" ] && vs_out "VS server ${wd} found STARTED (logged as stopped in ${VS_OUT} - maybe stop has failed)"
           lr='STARTED'
         elif [ -z "${lr}" -a -n "${ls}" ] ; then
-          vs_out "VS server ${wd} not found STARTED (logged as started in ${VS_OUT} - maybe crashed)"
+          vs_out "VS server ${wd} not found STARTED (previously logged as started in ${VS_OUT} - maybe crashed)"
           lr='STARTED'
         else
           lr='STOPPED'
@@ -868,7 +939,7 @@ vs_setup() {
   echo
   if [ "${reply}" = 'y' -o "${reply}" = 'Y' ] ; then
     path_list="${VS_BAS%/*} ${VS_DAT} ${VS_DAT}/backup ${VS_LOG}"
-    if hash xdg-user-dir 2>/dev/null && pgrep -fc "(kde|gnome|lxde|xfce|mint|unity|fluxbox|openbox)" >/dev/null ; then
+    if hash xdg-user-dir 2>/dev/null && ps -eo args= | grep -qE "(kde|gnome|lxde|xfce|mint|unity|fluxbox|openbox)" ; then
       path_list="${path_list} ${FONTDIR} ${DESKDIR} ${MENUDIR}"
     else
       headless="yes"
@@ -1115,9 +1186,9 @@ vs_read_var() {
       VS_OUT)      val='Logs/server-main.txt'                        ;;
       VS_CLR)      val='mono'                                        ;;
       SP_HOST)     val='account.vintagestory.at:443'                 ;;
-      SP_PKEY)     val='l59rOf/3g9fX7Nxyhg457pQkFONpCN7R/ovScanZ0+g' ;;
+      SP_PKEY)     val='HFZBBiTM/vicQlTpQQR1aJgJZcITsBMJfDqHhByVQJ0' ;;
       SR_HOST)     val='api.vintagestory.at:443'                     ;;
-      SR_PKEY)     val='l59rOf/3g9fX7Nxyhg457pQkFONpCN7R/ovScanZ0+g' ;;
+      SR_PKEY)     val='HFZBBiTM/vicQlTpQQR1aJgJZcITsBMJfDqHhByVQJ0' ;;
       HOME)        val="${home}"                                     ;;
       HISTDIR)     val="${home}/ApplicationData"                     ;;
       DATADIR)     val="${home}/.config/VintagestoryData"            ;; # or use: "$(csharp -e 'print(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData));' 2>/dev/null)/VintagestoryData"
@@ -1191,7 +1262,7 @@ vs_set_env() {
   vs_toolcheck 'screen'       '4.0'
   i="$(cat ${VS_PID} 2>/dev/null)"; p="(${0##*/}|vs-.*)"
   if [ ${i:-$$} -ne ${6:-0} ] ; then
-    [ ${i:-$$} -ne $$ -a -n "$(pgrep -f "${p}" -F "${VS_PID}" 2>/dev/null)" ]  && vs_out -a "${0##*/} was temporarily locked by another VS command" 1
+    [ ${i:-$$} -ne $$ -a -n "$(ps -p "${i:-$$}" -eo comm | grep -qE "${p}")" ] && vs_out -a "${0##*/} was temporarily locked by another VS command" 1
     printf "$$" > "${VS_PID}"                                                  || vs_out -a "Unexpected condition E#24 (user was not able to create pidfile '${VS_PID}')" 3
     [ "$(cat ${VS_PID} 2>/dev/null)" = "$$" ]                                  || vs_out -a "${0##*/} is temporarily locked by another VS command" 1
     [ -d "${VS_BAS}" ]                      || err=" dir ${VS_BAS}"
@@ -1201,7 +1272,7 @@ vs_set_env() {
     [ -n "${err}"  -a "${1}" != "setup" ]                                      && vs_out -a "VS environment of not found (missing${err}). Please run '${VS_UI1}' with proper privileges" 1
     [ -z "${_TAG}" -a "${1}" != "setup" -a ! -x "${VS_BAS}/${VS_BIN}" ]        && vs_out -a "VS environment set up incomplete. Please run '${VS_UI1}' with proper privileges" 1
     if [ -f "${VS_BAS}/${VS_BIN}" ] ; then
-      bv=$(vs_user "${VS_CLR} '${VS_BAS}/${VS_BIN}' -v | tr -dc '[:print:]'")       # datapath workaround not needed in 1.5.1 ff.
+      bv=$(vs_user "${VS_CLR} '${VS_BAS}/${VS_BIN}' -v | tr -dc '[:print:]'")  # datapath workaround not needed in 1.5.1 ff.
       if [ "${bv}" != "${_VER}" -a "${1}" != "reinstall" ] ; then      
         vs_out "Current ${VS_BIN} binary version ${bv} out of sync with installation metadata tag (typically caused by manual installation)" 1
         echo; read -p "CONFIRMATION REQUIRED: Trying to recover metadata (Y/n) " -r reply; echo
@@ -1292,7 +1363,9 @@ vs_gen_workdir() {
       vs_out "Created new dir: $(ls -ld ${md})" -1
     fi
   done
+  ###
   [ -f "${VS_DAT}/${nd}/.info" ] || vs_user "printf 'STOPPED:${_VER}' >'${VS_DAT}/${nd}/.info'  2>/dev/null"   || vs_out -a "Unexpected condition E#25" 3
+  ###
   [ -e "${VS_DAT}/${nd}/Logs"  ] || vs_user "ln -sf '${VS_LOG}/${wd}' '${VS_DAT}/${nd}/Logs'"                  || vs_out -a "Unexpected condition E#26" 3
   [ -f "${VS_DAT}/${nd}/${cf}" ] || vs_user "printf '${jf}' >'${VS_DAT}/${nd}/${cf}'            2>/dev/null"   || vs_out -a "Unexpected condition E#27" 3
 }
@@ -1326,7 +1399,9 @@ vs_get_world_id() {
   i="${i#${sfix}}"
   for d in $(ls -tdx ${VS_DAT}/${sfix}*/${VS_CFG} 2>/dev/null) ; do
     data="${d%/${VS_CFG}}"; base="${data##*/}"; num="${base%%-*}"; count=$((count+1))
+    ###
     [ -f "${data}/.info" ] || vs_idx_data "${data}"                                             # collect/create missing metadata from existing configs and logs
+    ###
     [  ${num#${VS_PRE}}       -eq  ${1:-0}      ] 2>/dev/null   && wid="${base}" && break       # 1. numeric input: number matches to prefix (without prefix: section before first dash)
     [ "${base#${1:-${base}}}" !=  "${base}"     ]               && wid="${base}" && break       # 2. input without extension (starting with prefix): beginning string part matches (empty input too)
     [ "${base#${sfix}}"        =  "${1}"        ]               && wid="${base}" && break       # 3. input without extension and prefix: full name matches exactly
@@ -1536,11 +1611,14 @@ vs_restart() {
       if [ -d "${wd}" -a -f "${wd}/.info" ] ; then
         run_info=$(cat "${wd}/.info" 2>/dev/null)
         vs_stop "${wd##*/}" "${run_info}"                              # all instances will be stopped
-        run="${run_info%STARTED:*}"
         [ "${run_info%:*}" = "STARTED"    ] && run='Y' || run=''       # identify instance to be started
         [ "${flag}" = '-r'                ] && vs_recover "${wd##*/}"  # including migration in the case of a backup recovery (means world id should be set) 
         [ "${flag}" = '-c' -a -n "${run}" ] && vs_backup  "${wd}"      # including migration in the case of a version change
-        [ -n "${run}" ] && vs_start "${wd##*/}" || vs_out "${wd##*/} (to be ${run_info%:*}) is not restarted."
+        if [ -n "${run}" ] ; then 
+          vs_start "${wd##*/}"
+        else
+          vs_out "${wd##*/} (to be ${run_info%:*}) is not restarted."
+        fi
       else
         vs_out "World ${wd##*/} not found" 1
       fi
