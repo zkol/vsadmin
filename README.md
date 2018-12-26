@@ -242,6 +242,7 @@ This is a list of potential topics for the next script versions.
 1. Split basic start/stop/status features from server.sh (portable according to system V init style, with minimized handling of one datapath relative to the script location) from the extended admin features (move the existing features to a vsadmin.sh script)
 1. Replace screen, instead start the daemon by POSIX shell commands, improve force stop/restart feature (in the case of a not responsive server status)
 1. Better documentation of minimal server requirements as well as refinement of requirement checks
+1. Known issue that user vintagestory might not be found in passwd when doing setup
 
 ### Prio 2
 1. Add options to repair/cleanup/uninstall for old/failed installs (searching the file system for Vintage Story binaries)
@@ -311,15 +312,15 @@ Based on the selected world identifier, the script tracks the status of the corr
    * **` vs_stop  `** reads target status to show it in the logged output (no dependig logic), new status is set afterwards via **` vs_idx_data `**
    * **` vs_start `** reads and uses version to detect a version change, new status is set afterwards via **` vs_idx_data `**
    * **` vs_recover `** merges current and restored status, **` vs_idx_data `** is called afterwards, but not used to update the status!
-
-
-# issue: vintagestory not found in passwd when doing setup
-
  
 More info will be added later.
 
+## FAQ
 
+### Error #18 complains about wget return code 5
 
+To ensure integrity, the update is pinned to the known public key of the Vintage Story host. A mismatch that could indicate a "man in the middle" causes a SSL verification failure.
+The public key known from the past is stored as base64 encoded sha256 hash in the editable text configuration file (check .etc file in the working directory of server.sh). 
 
 
 
