@@ -46,6 +46,9 @@
 #            Tweak: Updated the VintageStory Public Keys
 # 2018-12-27 Script version 1.6.0
 #            Tweak: consider new location for game fonts
+# 2018-12-29 Script version 1.6.1
+#            Fixed: DESKDIR pointing to $HOME
+#            Fixed: setup must not touch existing home directories
 
 
 #######################################
@@ -958,11 +961,11 @@ vs_setup() {
       fi
       [ -d '/etc/opt' ] && { chown root:root '/etc/opt'; chmod -fR g-w '/etc/opt'; } || mkdir -m 755 -p '/etc/opt'
       for md in ${HOME} ${path_list} ; do
-        if [ -d "${md}" ] ; then
+        if [ -d "${md}" -a "${md}" != "${HOME}" ] ; then
           chmod -fR g+w "${md}"                     2>/dev/null      || vs_out -a "Path ${md} privileges adjustment failed" 3
           chown -fR ${VS_OWN}:${VS_OWN} "${md}"     2>/dev/null      || vs_out -a "Path '${md}' ownership adjustment failed" 3
           vs_out "Adjusted path: $(ls -ld ${md})" -1
-        else
+        elif [ ! -d "${md}" ] ; then
           mkdir -m 775 -p "${md}"                   2>/dev/null      || vs_out -a "Path ${md} creation failed" 3
           chown "${VS_OWN}:${VS_OWN}" -fR "${md}"   2>/dev/null      || vs_out -a "Path '${md}' privileges setup failed" 3
           vs_out "Setup new path: $(ls -ld ${md})"
@@ -1168,37 +1171,37 @@ vs_read_var() {
   home=$(eval echo "~${VS_OWN}")
   if [ -z "${val#*=}" ] ; then   # use predefined default values
     case ${1} in
-      VS_HIS)      val=2                                             ;;
-      VS_OLD)      val=180                                           ;;
-      VS_DPN)      val=42420                                         ;;
-      VS_PRE)      val='w'                                           ;; # val='-' to disable
-      VS_TAG)      val='stable'                                      ;;
-      VS_TYP)      val='vs_server'                                   ;;
-      VS_OWN)      val='vintagestory'                                ;;
-      VS_ETC)      val='/etc/opt/vintagestory'                       ;;
-      VS_BAS)      val='/opt/vintagestory/game'                      ;;
-      VS_DAT)      val='/var/opt/vintagestory'                       ;;
-      VS_LOG)      val='/var/log/vintagestory'                       ;;
-      VS_PID)      val='/var/lock/vs-command.pid'                    ;;
-      VS_PIF)      val='/var/lock/vs-port.info'                      ;;
-      VS_RTR)      val='/var/tmp/vs-command.tag'                     ;;
-      VS_BIN)      val='VintagestoryServer.exe'                      ;;
-      VS_DTL)      val='Vintagestory.desktop'                        ;;
-      VS_FNT)      val='assets/game/fonts'                           ;; # previously: assets/fonts
-      VS_CFG)      val='serverconfig.json'                           ;;
-      VS_MIG)      val='servermagicnumbers.json Playerdata'          ;;
-      VS_OUT)      val='Logs/server-main.txt'                        ;;
-      VS_CLR)      val='mono'                                        ;;
-      SP_HOST)     val='account.vintagestory.at:443'                 ;;
-      SP_PKEY)     val='HFZBBiTM/vicQlTpQQR1aJgJZcITsBMJfDqHhByVQJ0' ;;
-      SR_HOST)     val='api.vintagestory.at:443'                     ;;
-      SR_PKEY)     val='HFZBBiTM/vicQlTpQQR1aJgJZcITsBMJfDqHhByVQJ0' ;;
-      HOME)        val="${home}"                                     ;;
-      HISTDIR)     val="${home}/ApplicationData"                     ;;
-      DATADIR)     val="${home}/.config/VintagestoryData"            ;; # or use: "$(csharp -e 'print(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData));' 2>/dev/null)/VintagestoryData"
-      MENUDIR)     val="${home}/.local/share/applications"           ;; # for all: MENUDIR="/usr/share/applications"
-      FONTDIR)     val="${home}/.fonts"                              ;; # for all: FONTDIR="/usr/share/fonts"
-      DESKDIR)     val="$(vs_user xdg-user-dir DESKTOP)"             ;; # only for the user
+      VS_HIS)      val=2                                                  ;;
+      VS_OLD)      val=180                                                ;;
+      VS_DPN)      val=42420                                              ;;
+      VS_PRE)      val='w'                                                ;; # val='-' to disable
+      VS_TAG)      val='stable'                                           ;;
+      VS_TYP)      val='vs_server'                                        ;;
+      VS_OWN)      val='vintagestory'                                     ;;
+      VS_ETC)      val='/etc/opt/vintagestory'                            ;;
+      VS_BAS)      val='/opt/vintagestory/game'                           ;;
+      VS_DAT)      val='/var/opt/vintagestory'                            ;;
+      VS_LOG)      val='/var/log/vintagestory'                            ;;
+      VS_PID)      val='/var/lock/vs-command.pid'                         ;;
+      VS_PIF)      val='/var/lock/vs-port.info'                           ;;
+      VS_RTR)      val='/var/tmp/vs-command.tag'                          ;;
+      VS_BIN)      val='VintagestoryServer.exe'                           ;;
+      VS_DTL)      val='Vintagestory.desktop'                             ;;
+      VS_FNT)      val='assets/game/fonts'                                ;; # previously: assets/fonts
+      VS_CFG)      val='serverconfig.json'                                ;;
+      VS_MIG)      val='servermagicnumbers.json Playerdata'               ;;
+      VS_OUT)      val='Logs/server-main.txt'                             ;;
+      VS_CLR)      val='mono'                                             ;;
+      SP_HOST)     val='account.vintagestory.at:443'                      ;;
+      SP_PKEY)     val='HFZBBiTM/vicQlTpQQR1aJgJZcITsBMJfDqHhByVQJ0'      ;;
+      SR_HOST)     val='api.vintagestory.at:443'                          ;;
+      SR_PKEY)     val='HFZBBiTM/vicQlTpQQR1aJgJZcITsBMJfDqHhByVQJ0'      ;;
+      HOME)        val="${home}"                                          ;;
+      HISTDIR)     val="${home}/ApplicationData"                          ;;
+      DATADIR)     val="${home}/.config/VintagestoryData"                 ;; # or use: "$(csharp -e 'print(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData));' 2>/dev/null)/VintagestoryData"
+      MENUDIR)     val="${home}/.local/share/applications"                ;; # for all: MENUDIR="/usr/share/applications"
+      FONTDIR)     val="${home}/.fonts"                                   ;; # for all: FONTDIR="/usr/share/fonts"
+      DESKDIR)     val="$(vs_user source .profile; xdg-user-dir DESKTOP)" ;; # only for the user
     esac
   fi
   eval "export ${1}='${val#*=}'"
