@@ -44,6 +44,9 @@
 #            Fixed: Restart finishes with wrong result message
 #            Tweak: Replaced the use of pgrep with posix compliant code
 #            Tweak: Updated the VintageStory Public Keys
+# 2018-12-27 Script version 1.6.0
+#            Tweak: consider new location for game fonts
+
 
 #######################################
 # Standard output (logger) and exit
@@ -1010,7 +1013,7 @@ vs_setup() {
     vs_restart -c  && vs_maintain_legacy ${VS_OLD}
     if [ -f "${VS_BAS}/${VS_DTL}" -a -z "${headless}" ] ; then
       vs_write_env VS_HIS VS_OLD VS_DPN VS_PRE VS_TAG VS_TYP VS_OWN VS_BAS VS_DAT VS_LOG OPTIONS HISTDIR DATADIR MENUDIR FONTDIR DESKDIR SR_HOST SR_PKEY SP_HOST SP_PKEY
-      for i in $(find "${VS_BAS}/assets/fonts" -name *.ttf -type f); do 
+      for i in $(find "${VS_BAS}/${VS_FNT}" -name *.ttf -type f); do 
         [ -f "${FONTDIR}/${i##*/}" ] || ln -sf "${i}" "${FONTDIR}"
       done
       if [ -f "${MENUDIR}/${VS_DTL}" ] ; then
@@ -1181,6 +1184,7 @@ vs_read_var() {
       VS_RTR)      val='/var/tmp/vs-command.tag'                     ;;
       VS_BIN)      val='VintagestoryServer.exe'                      ;;
       VS_DTL)      val='Vintagestory.desktop'                        ;;
+      VS_FNT)      val='assets/game/fonts'                           ;; # previously: assets/fonts
       VS_CFG)      val='serverconfig.json'                           ;;
       VS_MIG)      val='servermagicnumbers.json Playerdata'          ;;
       VS_OUT)      val='Logs/server-main.txt'                        ;;
@@ -1231,6 +1235,7 @@ vs_read_var() {
 #   VS_PRE : world data naming prefix
 #   VS_BIN : VS binary name
 #   VS_DTL : VS desktop launcher
+#   VS_FNT : VS game font location
 #   VS_TAG : branch stable | unstable
 #   VS_TYP : type vs_server | vs_archive
 #   VS_OWN : world data owner
@@ -1242,8 +1247,6 @@ vs_read_var() {
 #   VS_PID : script pidfile
 #   VS_PIF : port information file
 #   VS_RTR : change restart tracker
-#   VS_BIN : VS binary name
-#   VS_DTL : VS desktop launcher
 #   VS_CFG : serverconfig file name
 #   VS_OUT : server output file
 #   VS_CLR : C# runtime environment (interpreter)
@@ -1255,7 +1258,7 @@ vs_read_var() {
 #######################################
 vs_set_env() {
   local etc="$(readlink -f -- "${0%/*}")/.etc" reply='' i p err bv             # etc is the "physical" location of the symbolic link file
-  vs_read_env ${etc} VS_HIS VS_OLD VS_DPN VS_PRE VS_TAG VS_TYP VS_OWN VS_BAS VS_DAT VS_LOG VS_PID VS_PIF VS_RTR OPTIONS VS_BIN VS_DTL VS_CFG VS_MIG VS_OUT VS_CLR SR_HOST SR_PKEY SP_HOST SP_PKEY
+  vs_read_env ${etc} VS_HIS VS_OLD VS_DPN VS_PRE VS_TAG VS_TYP VS_OWN VS_BAS VS_DAT VS_LOG VS_PID VS_PIF VS_RTR OPTIONS VS_BIN VS_DTL VS_FNT VS_CFG VS_MIG VS_OUT VS_CLR SR_HOST SR_PKEY SP_HOST SP_PKEY
   [ ! -e "${etc}" -a -f "${VS_ETC}" -a -O "${etc%/*}" ] && vs_user "ln -sf '${VS_ETC}' '${etc}'"
   vs_toolcheck ${VS_CLR}      '4.2'
   vs_toolcheck 'wget'         '1.17.9'

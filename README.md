@@ -322,11 +322,10 @@ More info will be added later.
 To ensure integrity, the update is pinned to the known public key of the Vintage Story host. A mismatch that could indicate a "man in the middle" causes a SSL verification failure.
 The public key known from the past is stored as base64 encoded sha256 hash in the editable text configuration file (check .etc file in the working directory of server.sh). 
 
+### No Button visible when starting the client
 
-
-
-
-
+To have visible buttons, please ensure that the game fonts are installed. When the client was previously installed by setup.sh please try again:
+     **` sudo ./server.sh setup `**
 
 
 
